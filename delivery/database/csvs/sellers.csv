@@ -1,3 +1,3 @@
-id,first_name,last_name,email
-106,McDonalds,Fastfood,mac@example.com
-107,Kentucky,Fastfood,kfc@example.com
+id,first_name,last_name,email,username
+106,McDonalds,Fastfood,mac@example.com,mac
+107,Kentucky,Fastfood,kfc@example.com,kfc
