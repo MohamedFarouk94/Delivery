@@ -10,37 +10,54 @@ def create_user(User, first_name='', last_name='', email='', username='', passwo
 			password=password)
 
 
-def create_person(User, Person, **kwargs):
+def create_person(User, Token, Person, **kwargs):
 	user = create_user(User, **kwargs)
+	Token.objects.create(user=user)
 	return Person.objects.create(user=user)
 
 
-def create_all_customers(User, Customer):
+def create_item(Item, **kwargs):
+	Item.objects.create(**kwargs)
+
+
+def create_all_customers(User, Token, Customer):
 	customers_df = pd.read_csv('database/csvs/customers.csv')
 	for _, row in tqdm(customers_df.iterrows()):
 		kwargs = {'first_name': row.first_name,
 				'last_name': row.last_name,
 				'email': row.email,
 				'username': row.first_name.lower() + row.last_name.lower()}
-		customer = create_person(User, Customer, **kwargs)
+		customer = create_person(User, Token, Customer, **kwargs)
 		customer.create_pending_order()
 
 
-def create_all_pilots(User, Pilot):
+def create_all_pilots(User, Token, Pilot):
 	pilots_df = pd.read_csv('database/csvs/pilots.csv')
 	for _, row in tqdm(pilots_df.iterrows()):
 		kwargs = {'first_name': row.first_name,
 				'last_name': row.last_name,
 				'email': row.email,
 				'username': row.first_name.lower() + row.last_name.lower()}
-		create_person(User, Pilot, **kwargs)
+		pilot = create_person(User, Token, Pilot, **kwargs)
+		pilot.region = row.region
+		pilot.save()
 
 
-def create_all_sellers(User, Seller):
+def create_all_sellers(User, Token, Seller):
 	sellers_df = pd.read_csv('database/csvs/sellers.csv')
 	for _, row in tqdm(sellers_df.iterrows()):
 		kwargs = {'first_name': row.first_name,
 				'last_name': row.last_name,
 				'email': row.email,
 				'username': row.username}
-		create_person(User, Seller, **kwargs)
+		create_person(User, Token, Seller, **kwargs)
+
+
+def create_all_items(Item, Seller):
+	items_df = pd.read_csv('database/csvs/items.csv')
+	for _, row in tqdm(items_df.iterrows()):
+		kwargs = {'name': row.item_name,
+				'description': row.description,
+				'price': row.price,
+				'seller': Seller.objects.get(user__username=row.seller)}
+		create_item(Item, **kwargs)

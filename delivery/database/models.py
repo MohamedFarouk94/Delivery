@@ -60,6 +60,13 @@ class Customer(Person):
 class Pilot(Person):
 	plural = 'persons'
 
+	region = models.CharField(max_length=20)
+
+	def to_dict(self):
+		super_dict = super().to_dict()
+		super_dict['region'] = self.region
+		return super_dict
+
 
 class Item(models.Model):
 	plural = 'items',
@@ -79,8 +86,8 @@ class Item(models.Model):
 		return {
 			'id': self.id,
 			'name': self.name,
-			'seller-id': self.seller.id,
-			'seller-username': self.seller.username,
+			'seller-id': self.seller.user.id,
+			'seller-username': self.seller.user.username,
 			'description': self.description,
 			'price': self.price,
 			'rating': self.rating,
