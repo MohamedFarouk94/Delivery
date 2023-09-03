@@ -1,9 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
-from .strings import ORDER_STATUS_CHOICES, PERSON_STATUS_CHOICES, pn, od, ac
-from datetime import datetime as dt
-import matplotlib.pyplot as plt
-from PIL import Image
+from .strings import ORDER_STATUS_CHOICES, PERSON_STATUS_CHOICES, pn, ac
 
 
 # Create your models here.
