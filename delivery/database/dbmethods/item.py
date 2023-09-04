@@ -16,6 +16,7 @@ def to_dict(self):
 		'seller-username': self.seller.user.username,
 		'description': self.description,
 		'price': self.price,
+		'image': self.image.url,
 		'rating': self.rating,
 		'number-of-raters': self.n_raters,
 		'number-of-orders': self.n_orders,

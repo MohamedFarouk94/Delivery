@@ -32,10 +32,7 @@ class Pilot(Person):
 
 	region = models.CharField(max_length=20)
 
-	def to_dict(self):
-		super_dict = super().to_dict()
-		super_dict['region'] = self.region
-		return super_dict
+	from .dbmethods.pilot import to_dict
 
 
 class Item(models.Model):
