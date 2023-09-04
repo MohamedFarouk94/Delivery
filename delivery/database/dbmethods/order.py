@@ -1,10 +1,15 @@
-from database.strings import pn, od
+from database.strings import pn, od, cm
 from datetime import datetime as dt
 
 
 def raise_error_if_not_pending(self):
 	if self.status != pn:
 		raise AttributeError('This order is already ordered.')
+
+
+def raise_error_if_not_completed(self):
+	if self.status != cm:
+		raise AttributeError('This order in not completed.')
 
 
 def raise_error_if_item_exists(self, BasketItem, item):

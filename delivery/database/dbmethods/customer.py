@@ -35,3 +35,12 @@ def remove_from_basket(self, item):
 def make_order(self, Order, region):
 	self.get_pending_order().make_order(region)
 	self.create_pending_order(Order)
+
+
+def send_item_review(self, Review, item, rating, text):
+	Review.objects.create(reviewer=self, reviewed=item, rating=rating, text=text)
+
+
+def send_order_review(self, Review, order, rating, text):
+	order.raise_error_if_not_completed()
+	Review.objects.create(reviewer=self, reviewed=order, rating=rating, text=text)

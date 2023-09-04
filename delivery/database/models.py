@@ -1,4 +1,6 @@
 from django.db import models
+from django.contrib.contenttypes.fields import GenericForeignKey
+from django.contrib.contenttypes.models import ContentType
 from django.contrib.auth.models import User
 from .strings import ORDER_STATUS_CHOICES, PERSON_STATUS_CHOICES, pn, ac
 
@@ -6,7 +8,7 @@ from .strings import ORDER_STATUS_CHOICES, PERSON_STATUS_CHOICES, pn, ac
 # Create your models here.
 
 class Person(models.Model):
-	# first_name, last_name, username, email, password & date_joined are in User
+	# id, first_name, last_name, username, email, password & date_joined are in User
 	user = models.OneToOneField(User, on_delete=models.CASCADE)
 	status = models.CharField(max_length=10, choices=PERSON_STATUS_CHOICES, default=ac)
 
@@ -36,7 +38,7 @@ class Pilot(Person):
 
 
 class Item(models.Model):
-	plural = 'items',
+	plural = 'items'
 
 	id = models.BigAutoField(primary_key=True)
 	name = models.CharField(max_length=50)
@@ -53,7 +55,7 @@ class Item(models.Model):
 
 
 class Order(models.Model):
-	plural = 'orders',
+	plural = 'orders'
 
 	id = models.BigAutoField(primary_key=True)
 	customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
@@ -78,3 +80,22 @@ class BasketItem(models.Model):
 	quantity = models.IntegerField(default=1)
 
 	from .dbmethods.basket_item import get_quantity, edit_quantity, to_dict
+
+
+class Review(models.Model):
+	plural = 'reviews'
+
+	id = models.BigAutoField(primary_key=True)
+
+	reviewer_id = models.BigIntegerField()
+	reviewer_type = models.ForeignKey(ContentType, on_delete=models.CASCADE, related_name='REVIEWER')
+	reviewer = GenericForeignKey('reviewer_type', 'reviewer_id')
+
+	reviewed_id = models.BigIntegerField()
+	reviewed_type = models.ForeignKey(ContentType, on_delete=models.CASCADE, related_name='REVIEWED')
+	reviewed = GenericForeignKey('reviewed_type', 'reviewed_id')
+
+	text = models.TextField(blank=True)
+	rating = models.IntegerField(default=5)
+
+	from .dbmethods.review import to_dict
