@@ -5,22 +5,22 @@ from database.exceptions import BasketException, OrderException
 
 def raise_error_if_not_pending(self):
 	if self.status != pn:
-		raise AttributeError('This order is already ordered.')
+		raise OrderException('This order is already ordered.')
 
 
 def raise_error_if_not_completed(self):
 	if self.status != cm:
-		raise AttributeError('This order in not completed.')
+		raise OrderException('This order in not completed.')
 
 
 def raise_error_if_item_exists(self, BasketItem, item):
 	if len(BasketItem.objects.filter(order=self, item=item)):
-		raise AttributeError('This item is already in the basket.')
+		raise BasketException('This item is already in the basket.')
 
 
 def raise_error_if_item_doesnt_exist(self, BasketItem, item):
 	if not len(BasketItem.objects.filter(order=self, item=item)):
-		raise AttributeError('This item is not in the basket.')
+		raise BasketException('This item is not in the basket.')
 
 
 def get_basket(self, BasketItem):
