@@ -3,6 +3,7 @@ from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.auth.models import User
 from .strings import ORDER_STATUS_CHOICES, PERSON_STATUS_CHOICES, pn, ac
+from .validators import price_validator, rating_validator
 
 
 # Create your models here.
@@ -44,7 +45,7 @@ class Item(models.Model):
 	name = models.CharField(max_length=50)
 	seller = models.ForeignKey(Seller, on_delete=models.CASCADE)
 	description = models.TextField(blank=True)
-	price = models.FloatField()
+	price = models.FloatField(validators=[price_validator])
 	rating = models.FloatField(null=True)
 	n_raters = models.IntegerField(default=0)
 	n_orders = models.IntegerField(default=0)
@@ -96,6 +97,6 @@ class Review(models.Model):
 	reviewed = GenericForeignKey('reviewed_type', 'reviewed_id')
 
 	text = models.TextField(blank=True)
-	rating = models.IntegerField(default=5)
+	rating = models.IntegerField(default=5, validators=[rating_validator])
 
 	from .dbmethods.review import to_dict
