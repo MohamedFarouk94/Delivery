@@ -1,4 +1,5 @@
 from database.strings import pn
+from database.exceptions import OrderException
 
 
 def get_orders(self, Order):
@@ -11,7 +12,7 @@ def get_pending_order(self, Order):
 
 def create_pending_order(self, Order):
 	if len(Order.objects.filter(customer=self, status=pn)):
-		raise AttributeError('A pending order for this customer already exists.')
+		raise OrderException('A pending order for this customer already exists.')
 
 	return Order.objects.create(customer=self)
 

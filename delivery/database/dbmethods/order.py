@@ -1,5 +1,6 @@
 from database.strings import pn, od, cm
 from datetime import datetime as dt
+from database.exceptions import BasketException, OrderException
 
 
 def raise_error_if_not_pending(self):
