@@ -2,7 +2,7 @@ from django.db import models
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.auth.models import User
-from .strings import ORDER_STATUS_CHOICES, PERSON_STATUS_CHOICES, pn, ac
+from .strings import ORDER_STATUS_CHOICES, PERSON_STATUS_CHOICES, PERSON_CATEGORY_CHOICES, pn, ac, tbd
 from .validators import price_validator, rating_validator
 
 
@@ -12,6 +12,7 @@ class Person(models.Model):
 	# id, first_name, last_name, username, email, password & date_joined are in User
 	user = models.OneToOneField(User, on_delete=models.CASCADE)
 	status = models.CharField(max_length=10, choices=PERSON_STATUS_CHOICES, default=ac)
+	category = models.CharField(max_length=10, choices=PERSON_CATEGORY_CHOICES, default=tbd)
 
 	from .dbmethods.person import to_dict
 

@@ -3,7 +3,7 @@
 def to_dict(self):
 	return {
 		'id': self.user.id,
-		'group': self.__class__.plural,
+		'category': self.category,
 		'first-name': self.user.first_name,
 		'last-name': self.user.last_name,
 		'username': self.user.username,
