@@ -41,6 +41,7 @@ class Pilot(Person):
 
 class Item(models.Model):
 	plural = 'items'
+	editable_attributes = ['name', 'description', 'price']
 
 	id = models.BigAutoField(primary_key=True)
 	name = models.CharField(max_length=50)
@@ -53,7 +54,7 @@ class Item(models.Model):
 	n_buyouts = models.IntegerField(default=0)
 	image = models.ImageField(default='no_image_available.jpg')  # Assign image by path after 'images/' (not including images/)
 
-	from .dbmethods.item import to_dict, display_image
+	from .dbmethods.item import display_image, edit, to_dict
 
 
 class Order(models.Model):

@@ -8,6 +8,15 @@ def display_image(self):
 	plt.show()
 
 
+def edit(self, **kwargs):
+	# This is a very dangerous method
+	# Do all the needed safety actions before calling
+	# Assure that all kwargs are in self.__class__.editable_attributes
+	self.__dict__.update(**kwargs)
+	self.full_clean()  # This will trigger the validation errors
+	self.save()
+
+
 def to_dict(self):
 	return {
 		'id': self.id,
