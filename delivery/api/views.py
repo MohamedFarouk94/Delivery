@@ -8,52 +8,56 @@ from rest_framework.authentication import TokenAuthentication
 from .check_auth_exec import check_auth_exec
 
 
+# General Requests
+
 @api_view(['GET'])
-def helloWorld(request):
-	return Response({'first-word': 'Hello,', 'second-word': 'world!'})
+def helloWorld(request, **kwargs):
+	return check_auth_exec('helloWorld', request, **kwargs)
 
 
 @api_view(['GET'])
-def test(request):
-	return HttpResponseBadRequest('{"details": "Your request is bad"}')
+def test(request, **kwargs):
+	return check_auth_exec('test', request, **kwargs)
 
 
 @api_view(['GET'])
 @authentication_classes([TokenAuthentication])
 @permission_classes([IsAuthenticated])
-def whoAmI(request):
-	return Response(Person.objects.get(user=request.user).to_dict())
+def whoAmI(request, **kwargs):
+	return check_auth_exec('whoAmI', request, **kwargs)
 
 
 @api_view(['GET'])
-def getItems(request):
-	return Response([item.to_dict() for item in Item.objects.all()])
+def getItems(request, **kwargs):
+	return check_auth_exec('getItems', request, **kwargs)
 
 
 @api_view(['GET'])
 def getItem(request, **kwargs):
-	return Response(get_object_or_404(Item, id=kwargs['id']).to_dict())
+	return check_auth_exec('getItem', request, **kwargs)
 
 
 @api_view((['GET']))
 def getImage(request, **kwargs):
-	return Response({'b64img': get_object_or_404(Item, id=kwargs['id']).get_b64img().decode()})
+	return check_auth_exec('getImage', request, **kwargs)
 
 
 @api_view((['GET']))
-def getSellers(request):
-	return Response([seller.to_dict() for seller in Seller.objects.all()])
+def getSellers(request, **kwargs):
+	return check_auth_exec('getSellers', request, **kwargs)
 
 
 @api_view((['GET']))
 def getSeller(request, **kwargs):
-	return Response(get_object_or_404(Seller, id=kwargs['id']).to_dict())
+	return check_auth_exec('getSeller', request, **kwargs)
 
 
 @api_view((['GET']))
 def getSellerItems(request, **kwargs):
-	return Response([item.to_dict() for item in get_object_or_404(Seller, id=kwargs['id']).get_items(Item)])
+	return check_auth_exec('getSellerItems', request, **kwargs)
 
+
+# Seller Requests
 
 @api_view(['PUT'])
 @authentication_classes([TokenAuthentication])

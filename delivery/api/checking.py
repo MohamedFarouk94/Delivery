@@ -1,11 +1,72 @@
-from database.models import Item
+from database.models import Item, Seller
 from django.http import HttpResponseBadRequest, HttpResponseNotFound
 from django.core.exceptions import ObjectDoesNotExist
 
 
-def dummy_check(*awargs, **kwargs):
+# General Requests
+
+def helloWorld(request, **kwargs):
+	# Thers's no need to check anything
 	return True, None
 
+
+def test(request, **kwargs):
+	# Thers's no need to check anything
+	return True, None
+
+
+def whoAmI(request, **kwargs):
+	# Thers's no need to check anything
+	return True, None
+
+
+def getItems(request, **kwargs):
+	# Thers's no need to check anything
+	return True, None
+
+
+def getItem(request, **kwargs):
+	# Checking that item exists
+	try:
+		Item.objects.get(id=kwargs['id'])
+		return True, None
+	except ObjectDoesNotExist:
+		return False, HttpResponseNotFound('{"details": "Item not found."}')
+
+
+def getImage(request, **kwargs):
+	# Checking that item exists
+	try:
+		Item.objects.get(id=kwargs['id'])
+		return True, None
+	except ObjectDoesNotExist:
+		return False, HttpResponseNotFound('{"details": "Item not found."}')
+
+
+def getSellers(request, **kwargs):
+	# Thers's no need to check anything
+	return True, None
+
+
+def getSeller(request, **kwargs):
+	# Checking that seller exists
+	try:
+		Seller.objects.get(id=kwargs['id'])
+		return True, None
+	except ObjectDoesNotExist:
+		return False, HttpResponseNotFound('{"details": "Seller not found."}')
+
+
+def getSellerItems(request, **kwargs):
+	# Checking that seller exists
+	try:
+		Seller.objects.get(id=kwargs['id'])
+		return True, None
+	except ObjectDoesNotExist:
+		return False, HttpResponseNotFound('{"details": "Seller not found."}')
+
+
+# Seller Requests
 
 def editItem(request, **kwargs):
 	# Checking that item exists

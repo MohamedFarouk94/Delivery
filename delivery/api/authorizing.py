@@ -2,9 +2,54 @@ from database.models import Item, Person
 from django.http import HttpResponseForbidden
 
 
-def dummy_authorize(*args, **kwargs):
+# General Requests
+
+def helloWorld(request, **kwargs):
+	# There's no need to authorize anything
 	return True, None
 
+
+def test(request, **kwargs):
+	# There's no need to authorize anything
+	return True, None
+
+
+def whoAmI(request, **kwargs):
+	# There's no need to authorize anything
+	return True, None
+
+
+def getItems(request, **kwargs):
+	# There's no need to authorize anything
+	return True, None
+
+
+def getItem(request, **kwargs):
+	# There's no need to authorize anything
+	return True, None
+
+
+def getImage(request, **kwargs):
+	# There's no need to authorize anything
+	return True, None
+
+
+def getSellers(request, **kwargs):
+	# There's no need to authorize anything
+	return True, None
+
+
+def getSeller(request, **kwargs):
+	# There's no need to authorize anything
+	return True, None
+
+
+def getSellerItems(request, **kwargs):
+	# There's no need to authorize anything
+	return True, None
+
+
+# Seller Requests
 
 def editItem(request, **kwargs):
 	# Checking sender is the item owner

@@ -1,8 +1,48 @@
-from database.models import Item, Seller
+from database.models import Person, Item, Seller
 from rest_framework.response import Response
 from django.http import HttpResponseBadRequest
 from django.core.exceptions import ValidationError
 
+
+# General Requests
+
+def helloWorld(request, **kwargs):
+	return True, Response({'first-word': 'Hello,', 'second-word': 'world!'})
+
+
+def test(request, **kwargs):
+	return True, HttpResponseBadRequest('{"details": "Your request is bad"}')
+
+
+def whoAmI(request, **kwargs):
+	return True, Response(Person.objects.get(user=request.user).to_dict())
+
+
+def getItems(request, **kwargs):
+	return True, Response([item.to_dict() for item in Item.objects.all()])
+
+
+def getItem(request, **kwargs):
+	return True, Response(Item.objects.get(id=kwargs['id']).to_dict())
+
+
+def getImage(request, **kwargs):
+	return True, Response({'b64imd': Item.objects.get(id=kwargs['id']).get_b64img().decode()})
+
+
+def getSellers(request, **kwargs):
+	return True, Response([seller.to_dict() for seller in Seller.objects.all()])
+
+
+def getSeller(request, **kwargs):
+	return True, Response(Seller.objects.get(id=kwargs['id']).to_dict())
+
+
+def getSellerItems(request, **kwargs):
+	return True, Response([item.to_dict() for item in Seller.objects.get(id=kwargs['id']).get_items(Item)])
+
+
+# Seller Requests
 
 def editItem(request, **kwargs):
 	item = Item.objects.get(id=kwargs['id'])
