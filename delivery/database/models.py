@@ -20,7 +20,7 @@ class Person(models.Model):
 class Seller(Person):
 	plural = 'sellers'
 
-	from .dbmethods.seller import get_items
+	from .dbmethods.seller import get_items, add_item, delete_item
 
 
 class Customer(Person):
@@ -48,13 +48,13 @@ class Item(models.Model):
 	seller = models.ForeignKey(Seller, on_delete=models.CASCADE)
 	description = models.TextField(blank=True)
 	price = models.FloatField(validators=[price_validator])
-	rating = models.FloatField(null=True)
+	rating = models.FloatField(null=True, blank=True)
 	n_raters = models.IntegerField(default=0)
 	n_orders = models.IntegerField(default=0)
 	n_buyouts = models.IntegerField(default=0)
 	image = models.ImageField(default='no_image_available.jpg')  # Assign image by path after 'images/' (not including images/)
 
-	from .dbmethods.item import display_image, edit, to_dict
+	from .dbmethods.item import display_image, get_b64img, set_image, assign_image, edit, to_dict, save
 
 
 class Order(models.Model):

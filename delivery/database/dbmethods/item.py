@@ -1,5 +1,29 @@
 import matplotlib.pyplot as plt
 from PIL import Image
+import base64
+
+
+def save(self, *args, **kwargs):
+	self.full_clean()  # This will trigger the validation errors
+	super(self.__class__, self).save(*args, **kwargs)
+
+
+def get_b64img(self):
+	with open(self.image.path, 'rb') as img:
+		b64img = base64.encodebytes(img.read())
+	return b64img
+
+
+def assign_image(self):
+	self.image = f"{self.seller.user.username}/{self.name.lower().replace(' ', '_')}.jpg"
+	self.save()
+
+
+def set_image(self, b64img):
+	img = open(f"images/{self.seller.user.username}/{self.name.lower().replace(' ', '_')}.jpg", 'wb')
+	img.write(base64.decodebytes(b64img))
+	self.assign_image()
+	return self.to_dict()
 
 
 def display_image(self):
@@ -13,7 +37,6 @@ def edit(self, **kwargs):
 	# Do all the needed safety actions before calling
 	# Assure that all kwargs are in self.__class__.editable_attributes
 	self.__dict__.update(**kwargs)
-	self.full_clean()  # This will trigger the validation errors
 	self.save()
 
 

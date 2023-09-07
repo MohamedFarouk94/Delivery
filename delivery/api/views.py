@@ -5,7 +5,7 @@ from database.models import Item, Seller, Person
 from django.shortcuts import get_object_or_404
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.authentication import TokenAuthentication
-from . import authorizing, checking, executing
+from .check_auth_exec import check_auth_exec
 
 
 @api_view(['GET'])
@@ -26,13 +26,18 @@ def whoAmI(request):
 
 
 @api_view(['GET'])
-def getItmes(request):
+def getItems(request):
 	return Response([item.to_dict() for item in Item.objects.all()])
 
 
 @api_view(['GET'])
 def getItem(request, **kwargs):
 	return Response(get_object_or_404(Item, id=kwargs['id']).to_dict())
+
+
+@api_view((['GET']))
+def getImage(request, **kwargs):
+	return Response({'b64img': get_object_or_404(Item, id=kwargs['id']).get_b64img().decode()})
 
 
 @api_view((['GET']))
@@ -54,12 +59,25 @@ def getSellerItems(request, **kwargs):
 @authentication_classes([TokenAuthentication])
 @permission_classes([IsAuthenticated])
 def editItem(request, **kwargs):
-	flag, response = True, None
+	return check_auth_exec('editItem', request, **kwargs)
 
-	if flag:
-		flag, response = checking.editItem(request, **kwargs)
-	if flag:
-		flag, response = authorizing.editItem(request, **kwargs)
-	if flag:
-		flag, response = executing.editItem(request, **kwargs)
-	return response
+
+@api_view(['POST'])
+@authentication_classes([TokenAuthentication])
+@permission_classes([IsAuthenticated])
+def addItem(request, **kwargs):
+	return check_auth_exec('addItem', request, **kwargs)
+
+
+@api_view(['DELETE'])
+@authentication_classes([TokenAuthentication])
+@permission_classes([IsAuthenticated])
+def deleteItem(request, **kwargs):
+	return check_auth_exec('deleteItem', request, **kwargs)
+
+
+@api_view(['PATCH'])
+@authentication_classes([TokenAuthentication])
+@permission_classes([IsAuthenticated])
+def setImage(request, **kwargs):
+	return check_auth_exec('setImage', request, **kwargs)
