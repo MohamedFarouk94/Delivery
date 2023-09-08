@@ -84,3 +84,45 @@ def setImage(request, **kwargs):
 		return False, HttpResponseForbidden('{"details": "Sender is not the item owner"}')
 
 	return True, None
+
+
+# Customer Requests
+
+def getBasket(request, **kwargs):
+	# Checking sender is a customer
+	if Person.objects.get(user=request.user).category != 'Customer':
+		return False, HttpResponseForbidden('{"details": "Sender is not a customer"}')
+
+	return True, None
+
+
+def addToBasket(request, **kwargs):
+	# Checking sender is a customer
+	if Person.objects.get(user=request.user).category != 'Customer':
+		return False, HttpResponseForbidden('{"details": "Sender is not a customer"}')
+
+	return True, None
+
+
+def removeFromBasket(request, **kwargs):
+	# Checking sender is a customer
+	if Person.objects.get(user=request.user).category != 'Customer':
+		return False, HttpResponseForbidden('{"details": "Sender is not a customer"}')
+
+	return True, None
+
+
+def editQuantity(request, **kwargs):
+	# Checking sender is a customer
+	if Person.objects.get(user=request.user).category != 'Customer':
+		return False, HttpResponseForbidden('{"details": "Sender is not a customer"}')
+
+	return True, None
+
+
+def makeOrder(request, **kwargs):
+	# Checking sender is a customer
+	if Person.objects.get(user=request.user).category != 'Customer':
+		return False, HttpResponseForbidden('{"details": "Sender is not a customer"}')
+
+	return True, None

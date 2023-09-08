@@ -120,3 +120,61 @@ def setImage(request, **kwargs):
 
 	return True, None
 
+
+# Customer Request
+
+def getBasket(request, **kwargs):
+	# Thers's no need to check anything
+	return True, None
+
+
+def addToBasket(request, **kwargs):
+	# Checking that item exists
+	try:
+		Item.objects.get(id=kwargs['id'])
+	except ObjectDoesNotExist:
+		return False, HttpResponseNotFound('{"details": "Item not found."}')
+
+	# Checking quantity is in data
+	try:
+		assert 'quantity' in request.data
+	except AssertionError:
+		return False, HttpResponseBadRequest('{"details": "No quntity found"}')
+
+	return True, None
+
+
+def removeFromBasket(request, **kwargs):
+	# Checking that item exists
+	try:
+		Item.objects.get(id=kwargs['id'])
+	except ObjectDoesNotExist:
+		return False, HttpResponseNotFound('{"details": "Item not found."}')
+
+	return True, None
+
+
+def editQuantity(request, **kwargs):
+	# Checking that item exists
+	try:
+		Item.objects.get(id=kwargs['id'])
+	except ObjectDoesNotExist:
+		return False, HttpResponseNotFound('{"details": "Item not found."}')
+
+	# Checking quantity is in data
+	try:
+		assert 'quantity' in request.data
+	except AssertionError:
+		return False, HttpResponseBadRequest('{"details": "No quntity found"}')
+
+	return True, None
+
+
+def makeOrder(request, **kwargs):
+	# Checking region is in data
+	try:
+		assert 'region' in request.data
+	except AssertionError:
+		return False, HttpResponseBadRequest('{"details": "No region found"}')
+
+	return True, None

@@ -85,3 +85,40 @@ def deleteItem(request, **kwargs):
 @permission_classes([IsAuthenticated])
 def setImage(request, **kwargs):
 	return check_auth_exec('setImage', request, **kwargs)
+
+
+# Customer Requests
+
+@api_view(['GET'])
+@authentication_classes([TokenAuthentication])
+@permission_classes([IsAuthenticated])
+def getBasket(request, **kwargs):
+	return check_auth_exec('getBasket', request, **kwargs)
+
+
+@api_view(['POST'])
+@authentication_classes([TokenAuthentication])
+@permission_classes([IsAuthenticated])
+def addToBasket(request, **kwargs):
+	return check_auth_exec('addToBasket', request, **kwargs)
+
+
+@api_view(['DELETE'])
+@authentication_classes([TokenAuthentication])
+@permission_classes([IsAuthenticated])
+def removeFromBasket(request, **kwargs):
+	return check_auth_exec('removeFromBasket', request, **kwargs)
+
+
+@api_view(['PATCH'])
+@authentication_classes([TokenAuthentication])
+@permission_classes([IsAuthenticated])
+def editQuantity(request, **kwargs):
+	return check_auth_exec('editQuantity', request, **kwargs)
+
+
+@api_view(['POST'])
+@authentication_classes([TokenAuthentication])
+@permission_classes([IsAuthenticated])
+def makeOrder(request, **kwargs):
+	return check_auth_exec('makeOrder', request, **kwargs)

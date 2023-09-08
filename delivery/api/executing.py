@@ -1,7 +1,8 @@
-from database.models import Person, Item, Seller
+from database.models import Person, Item, Seller, Customer, Order, BasketItem
 from rest_framework.response import Response
 from django.http import HttpResponseBadRequest
 from django.core.exceptions import ValidationError
+from database.exceptions import BasketException, OrderException
 
 
 # General Requests
@@ -83,4 +84,77 @@ def setImage(request, **kwargs):
 	try:
 		return True, Response(item.set_image(request.data['b64img'].encode('utf-8')))
 	except Exception:
+		return False, HttpResponseBadRequest('{"details": "Something wrong happened"}')
+
+
+# Customer Requests
+
+def getBasket(request, **kwargs):
+	customer = Customer.objects.get(user=request.user)
+	try:
+		return True, Response([basket_item.to_dict() for basket_item in customer.get_basket(Order, BasketItem)])
+	except Exception as e:
+		print('#####', str(e))
+		return False, HttpResponseBadRequest('{"details": "Something wrong happened"}')
+
+
+def addToBasket(request, **kwargs):
+	item = Item.objects.get(id=kwargs['id'])
+	customer = Customer.objects.get(user=request.user)
+	try:
+		return True, Response(customer.add_to_basket(Order, BasketItem, item, request.data['quantity']).to_dict())
+	except OrderException:
+		return False, HttpResponseBadRequest('{"details": "Order is not pending"}')
+	except BasketException:
+		return False, HttpResponseBadRequest('{"details": "Item is already in basket"}')
+	except ValidationError:
+		return False, HttpResponseBadRequest('{"details": "Found invalid value for quantity"}')
+	except Exception as e:
+		print('#####', str(e))
+		return False, HttpResponseBadRequest('{"details": "Something wrong happened"}')
+
+
+def removeFromBasket(request, **kwargs):
+	item = Item.objects.get(id=kwargs['id'])
+	customer = Customer.objects.get(user=request.user)
+	try:
+		return True, Response(customer.remove_from_basket(Order, BasketItem, item))
+	except OrderException:
+		return False, HttpResponseBadRequest('{"details": "Order is not pending"}')
+	except BasketException:
+		return False, HttpResponseBadRequest('{"details": "Item is not in basket"}')
+	except Exception as e:
+		print('#####', str(e))
+		return False, HttpResponseBadRequest('{"details": "Something wrong happened"}')
+
+
+def editQuantity(request, **kwargs):
+	item = Item.objects.get(id=kwargs['id'])
+	customer = Customer.objects.get(user=request.user)
+	quantity = request.data['quantity']
+	try:
+		customer.edit_quantity_of_item(Order, BasketItem, item, quantity)
+		return True, Response(customer.get_basket_item(Order, BasketItem, item).to_dict())
+	except OrderException:
+		return False, HttpResponseBadRequest('{"details": "Order is not pending"}')
+	except BasketException:
+		return False, HttpResponseBadRequest('{"details": "Item is not in basket"}')
+	except ValidationError:
+		return False, HttpResponseBadRequest('{"details": "Found invalid value for quantity"}')
+	except Exception as e:
+		print('#####', str(e))
+		return False, HttpResponseBadRequest('{"details": "Something wrong happened"}')
+
+
+def makeOrder(request, **kwargs):
+	customer = Customer.objects.get(user=request.user)
+	region = request.data['region']
+	try:
+		return True, Response(customer.make_order(Order, BasketItem, region).to_dict())
+	except OrderException:
+		return False, HttpResponseBadRequest('{"details": "Order is not pending"}')
+	except BasketException:
+		return False, HttpResponseBadRequest('{"details": "Empty basket cannot be ordered."}')
+	except Exception as e:
+		print('#####', str(e))
 		return False, HttpResponseBadRequest('{"details": "Something wrong happened"}')

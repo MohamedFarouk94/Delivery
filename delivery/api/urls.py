@@ -17,4 +17,9 @@ urlpatterns = [
 	path('items/add', views.addItem, name='addItem'),
 	path('items/<int:id>/delete', views.deleteItem, name='deleteItem'),
 	path('items/<int:id>/set-image', views.setImage, name='setImage'),
+	path('basket', views.getBasket, name='getBasket'),
+	path('items/<int:id>/add-to-basket', views.addToBasket, name='addToBasket'),
+	path('items/<int:id>/remove-from-basket', views.removeFromBasket, name='removeFromBasket'),
+	path('items/<int:id>/edit-quantity', views.editQuantity, name='editQuantity'),
+	path('make-order', views.makeOrder, name='makeOrder'),
 ]
