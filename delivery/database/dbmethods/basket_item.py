@@ -10,6 +10,7 @@ def get_quantity(self):
 def edit_quantity(self, quantity):
 	self.quantity = quantity
 	self.save()
+	return self
 
 
 def to_dict(self):

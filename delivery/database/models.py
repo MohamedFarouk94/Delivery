@@ -9,6 +9,9 @@ from .validators import price_validator, rating_validator, quantity_validator
 # Create your models here.
 
 class Person(models.Model):
+	ORDER = None
+	ITEM = None
+	REVIEW = None
 	# id, first_name, last_name, username, email, password & date_joined are in User
 	user = models.OneToOneField(User, on_delete=models.CASCADE)
 	status = models.CharField(max_length=10, choices=PERSON_STATUS_CHOICES, default=ac)
@@ -18,13 +21,11 @@ class Person(models.Model):
 
 
 class Seller(Person):
-	plural = 'sellers'
 
-	from .dbmethods.seller import get_items, add_item, delete_item
+	from .dbmethods.seller import get_items, add_item, delete_item, edit_item, set_image
 
 
 class Customer(Person):
-	plural = 'customers'
 
 	from .dbmethods.customer import get_orders, get_pending_order, create_pending_order
 	from .dbmethods.customer import get_basket, get_basket_item, edit_quantity_of_item, add_to_basket, remove_from_basket
@@ -32,7 +33,6 @@ class Customer(Person):
 
 
 class Pilot(Person):
-	plural = 'persons'
 
 	region = models.CharField(max_length=20)
 
@@ -40,7 +40,6 @@ class Pilot(Person):
 
 
 class Item(models.Model):
-	plural = 'items'
 	editable_attributes = ['name', 'description', 'price']
 
 	id = models.BigAutoField(primary_key=True)
@@ -58,7 +57,7 @@ class Item(models.Model):
 
 
 class Order(models.Model):
-	plural = 'orders'
+	BASKET_ITEM = None
 
 	id = models.BigAutoField(primary_key=True)
 	customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
@@ -75,7 +74,6 @@ class Order(models.Model):
 
 
 class BasketItem(models.Model):
-	plural = 'basket_items',
 
 	id = models.BigAutoField(primary_key=True),
 	order = models.ForeignKey(Order, on_delete=models.CASCADE)
@@ -86,7 +84,6 @@ class BasketItem(models.Model):
 
 
 class Review(models.Model):
-	plural = 'reviews'
 
 	id = models.BigAutoField(primary_key=True)
 
@@ -102,3 +99,20 @@ class Review(models.Model):
 	rating = models.IntegerField(default=5, validators=[rating_validator])
 
 	from .dbmethods.review import to_dict
+
+
+if not Person.ORDER:
+	print('Person.ORDER')
+	Person.ORDER = Order
+
+if not Person.ITEM:
+	print('Person.ITEM')
+	Person.ITEM = Item
+
+if not Person.REVIEW:
+	print('Person.REVIEW')
+	Person.REVIEW = Review
+
+if not Order.BASKET_ITEM:
+	print('Order.BASKET_ITEM')
+	Order.BASKET_ITEM = BasketItem

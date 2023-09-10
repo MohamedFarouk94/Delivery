@@ -74,7 +74,10 @@ def getItem(request, **kwargs):
 def getImage(request, **kwargs):
 	flag, response = True, None
 
-	# Thers's no need to check anything
+	# Checking that item exists
+	if flag:
+		flag, response = assert_object_exists(Item, **kwargs)
+
 	return flag, response
 
 

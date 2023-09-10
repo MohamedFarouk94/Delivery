@@ -23,7 +23,7 @@ def set_image(self, b64img):
 	img = open(f"images/{self.seller.user.username}/{self.name.lower().replace(' ', '_')}.jpg", 'wb')
 	img.write(base64.decodebytes(b64img))
 	self.assign_image()
-	return self.to_dict()
+	return self
 
 
 def display_image(self):
@@ -38,6 +38,7 @@ def edit(self, **kwargs):
 	# Assure that all kwargs are in self.__class__.editable_attributes
 	self.__dict__.update(**kwargs)
 	self.save()
+	return self
 
 
 def to_dict(self):
