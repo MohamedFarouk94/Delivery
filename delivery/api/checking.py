@@ -3,178 +3,210 @@ from django.http import HttpResponseBadRequest, HttpResponseNotFound
 from django.core.exceptions import ObjectDoesNotExist
 
 
+# utils
+
+def assert_object_exists(cls, **kwargs):
+	try:
+		cls.objects.get(id=kwargs['id'])
+		return True, None
+	except ObjectDoesNotExist:
+		return False, HttpResponseNotFound(f'{{"details": "{cls.__name__} not found."}}')
+
+
+def assert_attributes_exist(valid, coming):
+	try:
+		for key in coming:
+			assert key in valid
+		return True, None
+	except AssertionError:
+		return False, HttpResponseBadRequest('{"details": "Key word not found"}')
+
+
+def assert_attributes_contain(needed_words, coming):
+	try:
+		for key in needed_words:
+			assert key in coming
+		return True, None
+	except AssertionError:
+		return False, HttpResponseBadRequest(f'{{"details": "Request does not contain {key}."}}')
+
+
 # General Requests
 
 def helloWorld(request, **kwargs):
+	flag, response = True, None
+
 	# Thers's no need to check anything
-	return True, None
+	return flag, response
 
 
 def test(request, **kwargs):
+	flag, response = True, None
+
 	# Thers's no need to check anything
-	return True, None
+	return flag, response
 
 
 def whoAmI(request, **kwargs):
+	flag, response = True, None
+
 	# Thers's no need to check anything
-	return True, None
+	return flag, response
 
 
 def getItems(request, **kwargs):
+	flag, response = True, None
+
 	# Thers's no need to check anything
-	return True, None
+	return flag, response
 
 
 def getItem(request, **kwargs):
+	flag, response = True, None
+
 	# Checking that item exists
-	try:
-		Item.objects.get(id=kwargs['id'])
-		return True, None
-	except ObjectDoesNotExist:
-		return False, HttpResponseNotFound('{"details": "Item not found."}')
+	if flag:
+		flag, response = assert_object_exists(Item, **kwargs)
+
+	return flag, response
 
 
 def getImage(request, **kwargs):
-	# Checking that item exists
-	try:
-		Item.objects.get(id=kwargs['id'])
-		return True, None
-	except ObjectDoesNotExist:
-		return False, HttpResponseNotFound('{"details": "Item not found."}')
+	flag, response = True, None
+
+	# Thers's no need to check anything
+	return flag, response
 
 
 def getSellers(request, **kwargs):
+	flag, response = True, None
+
 	# Thers's no need to check anything
-	return True, None
+	return flag, response
 
 
 def getSeller(request, **kwargs):
+	flag, response = True, None
+
 	# Checking that seller exists
-	try:
-		Seller.objects.get(id=kwargs['id'])
-		return True, None
-	except ObjectDoesNotExist:
-		return False, HttpResponseNotFound('{"details": "Seller not found."}')
+	if flag:
+		flag, response = assert_object_exists(Seller, **kwargs)
+
+	return flag, response
 
 
 def getSellerItems(request, **kwargs):
+	flag, response = True, None
+
 	# Checking that seller exists
-	try:
-		Seller.objects.get(id=kwargs['id'])
-		return True, None
-	except ObjectDoesNotExist:
-		return False, HttpResponseNotFound('{"details": "Seller not found."}')
+	if flag:
+		flag, response = assert_object_exists(Seller, **kwargs)
+
+	return flag, response
 
 
 # Seller Requests
 
 def editItem(request, **kwargs):
+	flag, response = True, None
+
 	# Checking that item exists
-	try:
-		Item.objects.get(id=kwargs['id'])
-	except ObjectDoesNotExist:
-		return False, HttpResponseNotFound('{"details": "Item not found."}')
+	if flag:
+		flag, response = assert_object_exists(Item, **kwargs)
 
 	# Checking attributes exist in Item.editable_attributes
-	try:
-		for key in request.data.keys():
-			assert key in Item.editable_attributes
-	except AssertionError:
-		return False, HttpResponseBadRequest('{"details": "Found unknown key word"}')
+	if flag:
+		flag, response = assert_attributes_exist(Item.editable_attributes, request.data)
 
-	return True, None
+	return flag, response
 
 
 def addItem(request, **kwargs):
-	# Checking attributes exist in Item.editable_attributes
-	try:
-		for key in request.data.keys():
-			assert key in Item.editable_attributes
-	except AssertionError:
-		return False, HttpResponseBadRequest('{"details": "Found unknown key word"}')
+	flag, response = True, None
 
-	return True, None
+	# Checking attributes exist in Item.editable_attributes
+	if flag:
+		flag, response = assert_attributes_exist(Item.editable_attributes, request.data)
+
+	return flag, response
 
 
 def deleteItem(request, **kwargs):
+	flag, response = True, None
+
 	# Checking that item exists
-	try:
-		Item.objects.get(id=kwargs['id'])
-		return True, None
-	except ObjectDoesNotExist:
-		return False, HttpResponseNotFound('{"details": "Item not found."}')
+	if flag:
+		flag, response = assert_object_exists(Item, **kwargs)
+
+	return flag, response
 
 
 def setImage(request, **kwargs):
+	flag, response = True, None
+
 	# Checking that item exists
-	try:
-		Item.objects.get(id=kwargs['id'])
-	except ObjectDoesNotExist:
-		return False, HttpResponseNotFound('{"details": "Item not found."}')
+	if flag:
+		flag, response = assert_object_exists(Item, **kwargs)
 
 	# Checking b64img is in data
-	try:
-		assert 'b64img' in request.data
-	except AssertionError:
-		return False, HttpResponseBadRequest('{"details": "No image found"}')
+	if flag:
+		flag, response = assert_attributes_contain(['b64img'], request.data)
 
-	return True, None
+	return flag, response
 
 
 # Customer Request
 
 def getBasket(request, **kwargs):
+	flag, response = True, None
+
 	# Thers's no need to check anything
-	return True, None
+	return flag, response
 
 
 def addToBasket(request, **kwargs):
+	flag, response = True, None
+
 	# Checking that item exists
-	try:
-		Item.objects.get(id=kwargs['id'])
-	except ObjectDoesNotExist:
-		return False, HttpResponseNotFound('{"details": "Item not found."}')
+	if flag:
+		flag, response = assert_object_exists(Item, **kwargs)
 
 	# Checking quantity is in data
-	try:
-		assert 'quantity' in request.data
-	except AssertionError:
-		return False, HttpResponseBadRequest('{"details": "No quntity found"}')
+	if flag:
+		flag, response = assert_attributes_contain(['quantity'], request.data)
 
-	return True, None
+	return flag, response
 
 
 def removeFromBasket(request, **kwargs):
-	# Checking that item exists
-	try:
-		Item.objects.get(id=kwargs['id'])
-	except ObjectDoesNotExist:
-		return False, HttpResponseNotFound('{"details": "Item not found."}')
+	flag, response = True, None
 
-	return True, None
+	# Checking that item exists
+	if flag:
+		flag, response = assert_object_exists(Item, **kwargs)
+
+	return flag, response
 
 
 def editQuantity(request, **kwargs):
+	flag, response = True, None
+
 	# Checking that item exists
-	try:
-		Item.objects.get(id=kwargs['id'])
-	except ObjectDoesNotExist:
-		return False, HttpResponseNotFound('{"details": "Item not found."}')
+	if flag:
+		flag, response = assert_object_exists(Item, **kwargs)
 
 	# Checking quantity is in data
-	try:
-		assert 'quantity' in request.data
-	except AssertionError:
-		return False, HttpResponseBadRequest('{"details": "No quntity found"}')
+	if flag:
+		flag, response = assert_attributes_contain(['quantity'], request.data)
 
-	return True, None
+	return flag, response
 
 
 def makeOrder(request, **kwargs):
-	# Checking region is in data
-	try:
-		assert 'region' in request.data
-	except AssertionError:
-		return False, HttpResponseBadRequest('{"details": "No region found"}')
+	flag, response = True, None
 
-	return True, None
+	# Checking region is in data
+	if flag:
+		flag, response = assert_attributes_contain(['region'], request.data)
+
+	return flag, response

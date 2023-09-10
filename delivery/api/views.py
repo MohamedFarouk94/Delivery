@@ -1,8 +1,4 @@
-from rest_framework.response import Response
-from django.http import HttpResponseForbidden, HttpResponseBadRequest
 from rest_framework.decorators import api_view, permission_classes, authentication_classes
-from database.models import Item, Seller, Person
-from django.shortcuts import get_object_or_404
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.authentication import TokenAuthentication
 from .check_auth_exec import check_auth_exec

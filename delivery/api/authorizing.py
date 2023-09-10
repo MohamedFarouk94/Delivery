@@ -2,127 +2,185 @@ from database.models import Item, Person
 from django.http import HttpResponseForbidden
 
 
+# utils
+
+def get_sender_category(request):
+	return Person.objects.get(user=request.user).category
+
+
+def assert_sender_is(request, supposed):
+	try:
+		assert get_sender_category(request) == supposed
+		return True, None
+	except AssertionError:
+		return False, HttpResponseForbidden(f'{{"details": "Sender is not {supposed}."}}')
+
+
+def assert_sender_specific(request, item, item_attr):
+	try:
+		assert getattr(item, item_attr).user == request.user
+		return True, None
+	except AssertionError:
+		return False, HttpResponseForbidden(f'{{"details": "Sender is not the item {item_attr}"}}')
+
+
 # General Requests
 
 def helloWorld(request, **kwargs):
+	flag, response = True, None
+
 	# There's no need to authorize anything
-	return True, None
+	return flag, response
 
 
 def test(request, **kwargs):
+	flag, response = True, None
+
 	# There's no need to authorize anything
-	return True, None
+	return flag, response
 
 
 def whoAmI(request, **kwargs):
+	flag, response = True, None
+
 	# There's no need to authorize anything
-	return True, None
+	return flag, response
 
 
 def getItems(request, **kwargs):
+	flag, response = True, None
+
 	# There's no need to authorize anything
-	return True, None
+	return flag, response
 
 
 def getItem(request, **kwargs):
+	flag, response = True, None
+
 	# There's no need to authorize anything
-	return True, None
+	return flag, response
 
 
 def getImage(request, **kwargs):
+	flag, response = True, None
+
 	# There's no need to authorize anything
-	return True, None
+	return flag, response
 
 
 def getSellers(request, **kwargs):
+	flag, response = True, None
+
 	# There's no need to authorize anything
-	return True, None
+	return flag, response
 
 
 def getSeller(request, **kwargs):
+	flag, response = True, None
+
 	# There's no need to authorize anything
-	return True, None
+	return flag, response
 
 
 def getSellerItems(request, **kwargs):
+	flag, response = True, None
+
 	# There's no need to authorize anything
-	return True, None
+	return flag, response
 
 
 # Seller Requests
 
 def editItem(request, **kwargs):
-	# Checking sender is the item owner
 	item = Item.objects.get(id=kwargs['id'])
-	if request.user != item.seller.user:
-		return False, HttpResponseForbidden('{"details": "Sender is not the item owner"}')
+	flag, response = True, None
 
-	return True, None
+	# Checking sender is the item owner
+	if flag:
+		flag, response = assert_sender_specific(request, item, 'seller')
+
+	return flag, response
 
 
 def addItem(request, **kwargs):
-	# Checking sender is a seller
-	if Person.objects.get(user=request.user).category != 'Seller':
-		return False, HttpResponseForbidden('{"details": "Sender is not a seller"}')
+	flag, response = True, None
 
-	return True, None
+	# Checking sender is a seller
+	if flag:
+		flag, response = assert_sender_is(request, 'Seller')
+
+	return flag, response
 
 
 def deleteItem(request, **kwargs):
-	# Checking sender is the item owner
 	item = Item.objects.get(id=kwargs['id'])
-	if request.user != item.seller.user:
-		return False, HttpResponseForbidden('{"details": "Sender is not the item owner"}')
+	flag, response = True, None
 
-	return True, None
+	# Checking sender is the item owner
+	if flag:
+		flag, response = assert_sender_specific(request, item, 'seller')
+
+	return flag, response
 
 
 def setImage(request, **kwargs):
-	# Checking sender is the item owner
 	item = Item.objects.get(id=kwargs['id'])
-	if request.user != item.seller.user:
-		return False, HttpResponseForbidden('{"details": "Sender is not the item owner"}')
+	flag, response = True, None
 
-	return True, None
+	# Checking sender is the item owner
+	if flag:
+		flag, response = assert_sender_specific(request, item, 'seller')
+
+	return flag, response
 
 
 # Customer Requests
 
 def getBasket(request, **kwargs):
-	# Checking sender is a customer
-	if Person.objects.get(user=request.user).category != 'Customer':
-		return False, HttpResponseForbidden('{"details": "Sender is not a customer"}')
+	flag, response = True, None
 
-	return True, None
+	# Checking sender is a customer
+	if flag:
+		flag, response = assert_sender_is(request, 'Customer')
+
+	return flag, response
 
 
 def addToBasket(request, **kwargs):
-	# Checking sender is a customer
-	if Person.objects.get(user=request.user).category != 'Customer':
-		return False, HttpResponseForbidden('{"details": "Sender is not a customer"}')
+	flag, response = True, None
 
-	return True, None
+	# Checking sender is a customer
+	if flag:
+		flag, response = assert_sender_is(request, 'Customer')
+
+	return flag, response
 
 
 def removeFromBasket(request, **kwargs):
-	# Checking sender is a customer
-	if Person.objects.get(user=request.user).category != 'Customer':
-		return False, HttpResponseForbidden('{"details": "Sender is not a customer"}')
+	flag, response = True, None
 
-	return True, None
+	# Checking sender is a customer
+	if flag:
+		flag, response = assert_sender_is(request, 'Customer')
+
+	return flag, response
 
 
 def editQuantity(request, **kwargs):
-	# Checking sender is a customer
-	if Person.objects.get(user=request.user).category != 'Customer':
-		return False, HttpResponseForbidden('{"details": "Sender is not a customer"}')
+	flag, response = True, None
 
-	return True, None
+	# Checking sender is a customer
+	if flag:
+		flag, response = assert_sender_is(request, 'Customer')
+
+	return flag, response
 
 
 def makeOrder(request, **kwargs):
-	# Checking sender is a customer
-	if Person.objects.get(user=request.user).category != 'Customer':
-		return False, HttpResponseForbidden('{"details": "Sender is not a customer"}')
+	flag, response = True, None
 
-	return True, None
+	# Checking sender is a customer
+	if flag:
+		flag, response = assert_sender_is(request, 'Customer')
+
+	return flag, response
