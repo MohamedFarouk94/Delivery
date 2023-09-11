@@ -1,4 +1,4 @@
-from database.models import Item, Person
+from database.models import Item, Person, Order
 from django.http import HttpResponseForbidden
 
 
@@ -10,18 +10,26 @@ def get_sender_category(request):
 
 def assert_sender_is(request, supposed):
 	try:
-		assert get_sender_category(request) == supposed
+		assert get_sender_category(request) == supposed or get_sender_category(request) in supposed
 		return True, None
 	except AssertionError:
 		return False, HttpResponseForbidden(f'{{"details": "Sender is not {supposed}."}}')
 
 
-def assert_sender_specific(request, item, item_attr):
+def assert_sender_specific(request, obj, attr):
 	try:
-		assert getattr(item, item_attr).user == request.user
+		assert getattr(obj, attr).user == request.user
 		return True, None
 	except AssertionError:
-		return False, HttpResponseForbidden(f'{{"details": "Sender is not the item {item_attr}"}}')
+		return False, HttpResponseForbidden(f'{{"details": "Sender is not the {obj.__class__.__name__.lower()} {attr}"}}')
+
+
+def assert_sender_true(request, f):
+	try:
+		assert f(request)
+		return True, None
+	except AssertionError:
+		return False, HttpResponseForbidden(f'{{"details": "Sender is not authorized to access this information."}}')
 
 
 # General Requests
@@ -182,5 +190,39 @@ def makeOrder(request, **kwargs):
 	# Checking sender is a customer
 	if flag:
 		flag, response = assert_sender_is(request, 'Customer')
+
+	return flag, response
+
+
+def cancelOrder(request, **kwargs):
+	order = Order.objects.get(id=kwargs['id'])
+	flag, response = True, None
+
+	# Checking sender is the order's customer
+	if flag:
+		flag, response = assert_sender_specific(request, order, 'customer')
+
+	return flag, response
+
+
+# Customer & Pilot Requests
+
+def getOrders(request, **kwargs):
+	flag, response = True, None
+
+	# Checking sender is a customer or a pilot
+	if flag:
+		flag, response = assert_sender_is(request, ['Customer', 'Pilot'])
+
+	return flag, response
+
+
+def getOrder(request, **kwargs):
+	order = Order.objects.get(id=kwargs['id'])
+	flag, response = True, None
+
+	# Checking sender is related to order
+	if flag:
+		flag, response = assert_sender_true(request, lambda r: order.know_this_person(Person.objects.get(user=r.user)))
 
 	return flag, response

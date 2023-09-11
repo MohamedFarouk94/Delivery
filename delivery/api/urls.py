@@ -22,4 +22,7 @@ urlpatterns = [
 	path('items/<int:id>/remove-from-basket', views.removeFromBasket, name='removeFromBasket'),
 	path('items/<int:id>/edit-quantity', views.editQuantity, name='editQuantity'),
 	path('make-order', views.makeOrder, name='makeOrder'),
+	path('orders', views.getOrders, name='getOrders'),
+	path('orders/<int:id>', views.getOrder, name='getOrder'),
+	path('orders/<int:id>/cancel', views.cancelOrder, name='cancelOrder'),
 ]

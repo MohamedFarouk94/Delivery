@@ -13,6 +13,10 @@ def edit_quantity(self, quantity):
 	return self
 
 
+def get_deserved_amount(self):
+	return self.quantity * self.item.price
+
+
 def to_dict(self):
 	return {
 		'id': self.id,
@@ -22,5 +26,5 @@ def to_dict(self):
 		'item-id': self.item.id,
 		'item-name': self.item.name,
 		'quantity': self.quantity,
-		'total-price': self.quantity * self.item.price
+		'total-price': self.get_deserved_amount()
 	}

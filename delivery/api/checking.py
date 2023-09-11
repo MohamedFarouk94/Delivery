@@ -1,4 +1,4 @@
-from database.models import Item, Seller
+from database.models import Item, Seller, Order
 from django.http import HttpResponseBadRequest, HttpResponseNotFound
 from django.core.exceptions import ObjectDoesNotExist
 
@@ -158,7 +158,7 @@ def setImage(request, **kwargs):
 	return flag, response
 
 
-# Customer Request
+# Customer Requests
 
 def getBasket(request, **kwargs):
 	flag, response = True, None
@@ -211,5 +211,34 @@ def makeOrder(request, **kwargs):
 	# Checking region is in data
 	if flag:
 		flag, response = assert_attributes_contain(['region'], request.data)
+
+	return flag, response
+
+
+def cancelOrder(request, **kwargs):
+	flag, response = True, None
+
+	# Checking that order exists
+	if flag:
+		flag, response = assert_object_exists(Order, **kwargs)
+
+	return flag, response
+
+
+# Customer & Pilot Requests
+
+def getOrders(request, **kwargs):
+	flag, response = True, None
+
+	# Thers's no need to check anything
+	return flag, response
+
+
+def getOrder(request, **kwargs):
+	flag, response = True, None
+
+	# Checking that order exists
+	if flag:
+		flag, response = assert_object_exists(Order, **kwargs)
 
 	return flag, response

@@ -12,12 +12,16 @@ class Person(models.Model):
 	ORDER = None
 	ITEM = None
 	REVIEW = None
+
 	# id, first_name, last_name, username, email, password & date_joined are in User
 	user = models.OneToOneField(User, on_delete=models.CASCADE)
 	status = models.CharField(max_length=10, choices=PERSON_STATUS_CHOICES, default=ac)
 	category = models.CharField(max_length=10, choices=PERSON_CATEGORY_CHOICES, default=tbd)
+	rating = models.FloatField(null=True, blank=True)
+	n_raters = models.IntegerField(default=0)
 
-	from .dbmethods.person import to_dict
+	from .dbmethods.person import get_orders, to_dict
+	from .dbmethods.ratings import update_rating, undo_rating
 
 
 class Seller(Person):
@@ -54,6 +58,7 @@ class Item(models.Model):
 	image = models.ImageField(default='no_image_available.jpg')  # Assign image by path after 'images/' (not including images/)
 
 	from .dbmethods.item import display_image, get_b64img, set_image, assign_image, edit, to_dict, save
+	from .dbmethods.ratings import update_rating, undo_rating
 
 
 class Order(models.Model):
@@ -66,11 +71,13 @@ class Order(models.Model):
 	status = models.CharField(max_length=10, choices=ORDER_STATUS_CHOICES, default=pn)
 	date_ordered = models.DateTimeField(null=True)
 	date_pilot_assigned = models.DateTimeField(null=True)
-	date_completed = models.DateTimeField(null=True)
+	date_concluded = models.DateTimeField(null=True)
 
 	from .dbmethods.order import raise_error_if_item_exists, raise_error_if_not_pending, raise_error_if_basket_empty, raise_error_if_item_doesnt_exist
+	from .dbmethods.order import raise_error_if_completed, raise_error_if_problem, raise_error_if_on_way, raise_error_if_canceled
 	from .dbmethods.order import get_basket, get_basket_item, get_quantity_of_item, edit_quantity_of_item, add_to_basket, remove_from_basket
-	from .dbmethods.order import make_order, to_dict
+	from .dbmethods.order import get_delivery_fee, get_prices_sum, get_deserved_amount
+	from .dbmethods.order import make_order, cancel_order, update_rating, undo_rating, know_this_person, to_dict
 
 
 class BasketItem(models.Model):
@@ -80,7 +87,7 @@ class BasketItem(models.Model):
 	item = models.ForeignKey(Item, on_delete=models.CASCADE)
 	quantity = models.IntegerField(default=1, validators=[quantity_validator])
 
-	from .dbmethods.basket_item import get_quantity, edit_quantity, to_dict, save
+	from .dbmethods.basket_item import get_quantity, edit_quantity, get_deserved_amount, to_dict, save
 
 
 class Review(models.Model):
@@ -98,7 +105,7 @@ class Review(models.Model):
 	text = models.TextField(blank=True)
 	rating = models.IntegerField(default=5, validators=[rating_validator])
 
-	from .dbmethods.review import to_dict
+	from .dbmethods.review import to_dict, save, delete
 
 
 if not Person.ORDER:
@@ -116,3 +123,5 @@ if not Person.REVIEW:
 if not Order.BASKET_ITEM:
 	print('Order.BASKET_ITEM')
 	Order.BASKET_ITEM = BasketItem
+
+print()

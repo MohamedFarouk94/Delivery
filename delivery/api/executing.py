@@ -1,4 +1,4 @@
-from database.models import Person, Item, Seller, Customer
+from database.models import Person, Item, Seller, Customer, Order
 from rest_framework.response import Response
 from django.http import HttpResponseBadRequest
 from django.core.exceptions import ValidationError
@@ -222,6 +222,39 @@ def makeOrder(request, **kwargs):
 		return False, HttpResponseBadRequest('{"details": "Order is not pending"}')
 	except BasketException:
 		return False, HttpResponseBadRequest('{"details": "Empty basket cannot be ordered."}')
+	except Exception as e:
+		print('#UNKNOWN ERROR#', str(e))
+		return False, HttpResponseBadRequest('{"details": "Something wrong happened"}')
+
+
+def cancelOrder(request, **kwargs):
+	order = Order.objects.get(id=kwargs['id'])
+	try:
+		order = order.cancel_order()
+		return True, Response(order.to_dict())
+	except OrderException:
+		return False, HttpResponseBadRequest('{"details": "Order cannot be canceled."}')
+	except Exception as e:
+		print('#UNKNOWN ERROR#', str(e))
+		return False, HttpResponseBadRequest('{"details": "Something wrong happened"}')
+
+
+# Customer & Pilot Requests
+
+def getOrders(request, **kwargs):
+	person = Person.objects.get(user=request.user)
+	try:
+		orders = person.get_orders()
+		return True, Response(list_to_dict(orders))
+	except Exception as e:
+		print('#UNKNOWN ERROR#', str(e))
+		return False, HttpResponseBadRequest('{"details": "Something wrong happened"}')
+
+
+def getOrder(request, **kwargs):
+	order = Order.objects.get(id=kwargs['id'])
+	try:
+		return True, Response(order.to_dict())
 	except Exception as e:
 		print('#UNKNOWN ERROR#', str(e))
 		return False, HttpResponseBadRequest('{"details": "Something wrong happened"}')

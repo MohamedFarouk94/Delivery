@@ -118,3 +118,26 @@ def editQuantity(request, **kwargs):
 @permission_classes([IsAuthenticated])
 def makeOrder(request, **kwargs):
 	return check_auth_exec('makeOrder', request, **kwargs)
+
+
+@api_view(['DELETE'])
+@authentication_classes([TokenAuthentication])
+@permission_classes([IsAuthenticated])
+def cancelOrder(request, **kwargs):
+	return check_auth_exec('cancelOrder', request, **kwargs)
+
+
+# Customer & Pilot Requests
+
+@api_view(['GET'])
+@authentication_classes([TokenAuthentication])
+@permission_classes([IsAuthenticated])
+def getOrders(request, **kwargs):
+	return check_auth_exec('getOrders', request, **kwargs)
+
+
+@api_view(['GET'])
+@authentication_classes([TokenAuthentication])
+@permission_classes([IsAuthenticated])
+def getOrder(request, **kwargs):
+	return check_auth_exec('getOrder', request, **kwargs)
