@@ -53,6 +53,16 @@ def getSellerItems(request, **kwargs):
 	return check_auth_exec('getSellerItems', request, **kwargs)
 
 
+@api_view((['GET']))
+def getItemReviews(request, **kwargs):
+	return check_auth_exec('getItemReviews', request, **kwargs)
+
+
+@api_view((['GET']))
+def getItemReview(request, **kwargs):
+	return check_auth_exec('getItemReview', request, **kwargs)
+
+
 # Seller Requests
 
 @api_view(['PUT'])
@@ -125,6 +135,13 @@ def makeOrder(request, **kwargs):
 @permission_classes([IsAuthenticated])
 def cancelOrder(request, **kwargs):
 	return check_auth_exec('cancelOrder', request, **kwargs)
+
+
+@api_view(['POST'])
+@authentication_classes([TokenAuthentication])
+@permission_classes([IsAuthenticated])
+def sendItemReview(request, **kwargs):
+	return check_auth_exec('sendItemReview', request, **kwargs)
 
 
 # Customer & Pilot Requests

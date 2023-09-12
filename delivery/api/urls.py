@@ -13,18 +13,26 @@ urlpatterns = [
 	path('sellers', views.getSellers, name='getSellers'),
 	path('sellers/<int:id>', views.getSeller, name='getSeller'),
 	path('sellers/<int:id>/items', views.getSellerItems, name='getSellerItems'),
+	path('item-reviews', views.getItemReviews, name='getItemReviews'),
+	path('item-reviews/<int:id>', views.getItemReview, name='getItemReview'),
+
 	path('items/<int:id>/edit', views.editItem, name='editItem'),
 	path('items/add', views.addItem, name='addItem'),
 	path('items/<int:id>/delete', views.deleteItem, name='deleteItem'),
 	path('items/<int:id>/set-image', views.setImage, name='setImage'),
+
 	path('basket', views.getBasket, name='getBasket'),
 	path('items/<int:id>/add-to-basket', views.addToBasket, name='addToBasket'),
 	path('items/<int:id>/remove-from-basket', views.removeFromBasket, name='removeFromBasket'),
 	path('items/<int:id>/edit-quantity', views.editQuantity, name='editQuantity'),
 	path('make-order', views.makeOrder, name='makeOrder'),
+	path('orders/<int:id>/cancel', views.cancelOrder, name='cancelOrder'),
+	path('items/<int:id>/review', views.sendItemReview, name='sendItemReview'),
+
+
 	path('orders', views.getOrders, name='getOrders'),
 	path('orders/<int:id>', views.getOrder, name='getOrder'),
-	path('orders/<int:id>/cancel', views.cancelOrder, name='cancelOrder'),
+
 	path('available-orders', views.getAvailableOrders, name='getAvailableOrders'),
 	path('orders/<int:id>/accept', views.acceptOrder, name='acceptOrder'),
 	path('orders/<int:id>/drop', views.dropOrder, name='dropOrder'),

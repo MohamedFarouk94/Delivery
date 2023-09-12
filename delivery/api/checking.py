@@ -1,4 +1,4 @@
-from database.models import Item, Seller, Order
+from database.models import Item, Seller, Order, Review
 from django.http import HttpResponseBadRequest, HttpResponseNotFound
 from django.core.exceptions import ObjectDoesNotExist
 
@@ -104,6 +104,23 @@ def getSellerItems(request, **kwargs):
 	# Checking that seller exists
 	if flag:
 		flag, response = assert_object_exists(Seller, **kwargs)
+
+	return flag, response
+
+
+def getItemReviews(request, **kwargs):
+	flag, response = True, None
+
+	# Thers's no need to check anything
+	return flag, response
+
+
+def getItemReview(request, **kwargs):
+	flag, response = True, None
+
+	# Checking that review exists
+	if flag:
+		flag, response = assert_object_exists(Review, **kwargs)
 
 	return flag, response
 
@@ -221,6 +238,20 @@ def cancelOrder(request, **kwargs):
 	# Checking that order exists
 	if flag:
 		flag, response = assert_object_exists(Order, **kwargs)
+
+	return flag, response
+
+
+def sendItemReview(request, **kwargs):
+	flag, response = True, None
+
+	# Checking that item exists
+	if flag:
+		flag, response = assert_object_exists(Item, **kwargs)
+
+	# Checking data contains rating & text
+	if flag:
+		flag, response = assert_attributes_contain(['rating', 'text'], request.data)
 
 	return flag, response
 

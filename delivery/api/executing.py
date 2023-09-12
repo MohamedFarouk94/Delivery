@@ -1,8 +1,9 @@
-from database.models import Person, Item, Seller, Customer, Pilot, Order
+from database.models import Person, Item, Seller, Customer, Pilot, Order, Review
 from rest_framework.response import Response
 from django.http import HttpResponseBadRequest
 from django.core.exceptions import ValidationError
 from database.exceptions import BasketException, OrderException
+from django.contrib.contenttypes.models import ContentType
 
 
 # utils
@@ -92,6 +93,24 @@ def getSellerItems(request, **kwargs):
 	items = seller.get_items()
 	try:
 		return True, Response(list_to_dict(items))
+	except Exception as e:
+		print('#UNKNOWN ERROR#', str(e))
+		return False, HttpResponseBadRequest('{"details": "Something wrong happened"}')
+
+
+def getItemReviews(request, **kwargs):
+	reviews = [review for review in Review.objects.all() if isinstance(review.reviewed, Item)]
+	try:
+		return True, Response(list_to_dict(reviews))
+	except Exception as e:
+		print('#UNKNOWN ERROR#', str(e))
+		return False, HttpResponseBadRequest('{"details": "Something wrong happened"}')
+
+
+def getItemReview(request, **kwargs):
+	review = Review.objects.get(id=kwargs['id'])
+	try:
+		return True, Response(review.to_dict())
 	except Exception as e:
 		print('#UNKNOWN ERROR#', str(e))
 		return False, HttpResponseBadRequest('{"details": "Something wrong happened"}')
@@ -234,6 +253,23 @@ def cancelOrder(request, **kwargs):
 		return True, Response(order.to_dict())
 	except OrderException:
 		return False, HttpResponseBadRequest('{"details": "Order cannot be canceled."}')
+	except Exception as e:
+		print('#UNKNOWN ERROR#', str(e))
+		return False, HttpResponseBadRequest('{"details": "Something wrong happened"}')
+
+
+def sendItemReview(request, **kwargs):
+	item = Item.objects.get(id=kwargs['id'])
+	customer = Customer.objects.get(user=request.user)
+	rating = request.data['rating']
+	text = request.data['text']
+	try:
+		review = customer.send_item_review(item, rating, text)
+		return True, Response(review.to_dict())
+	except ValueError:
+		return False, HttpResponseBadRequest('{"details": "Found value error in some attribute"}')
+	except ValidationError:
+		return False, HttpResponseBadRequest('{"details": "Found invalid value for some attribute"}')
 	except Exception as e:
 		print('#UNKNOWN ERROR#', str(e))
 		return False, HttpResponseBadRequest('{"details": "Something wrong happened"}')

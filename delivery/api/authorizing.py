@@ -1,4 +1,4 @@
-from database.models import Item, Person, Order
+from database.models import Item, Person, Order, Review
 from django.http import HttpResponseForbidden
 
 
@@ -27,6 +27,14 @@ def assert_sender_specific(request, obj, attr):
 def assert_sender_true(request, f):
 	try:
 		assert f(request)
+		return True, None
+	except AssertionError:
+		return False, HttpResponseForbidden(f'{{"details": "Sender is not authorized to access this information."}}')
+
+
+def assert_resource_true(f, **kwargs):
+	try:
+		assert f(**kwargs)
 		return True, None
 	except AssertionError:
 		return False, HttpResponseForbidden(f'{{"details": "Sender is not authorized to access this information."}}')
@@ -94,6 +102,23 @@ def getSellerItems(request, **kwargs):
 	flag, response = True, None
 
 	# There's no need to authorize anything
+	return flag, response
+
+
+def getItemReviews(request, **kwargs):
+	flag, response = True, None
+
+	# There's no need to authorize anything
+	return flag, response
+
+
+def getItemReview(request, **kwargs):
+	flag, response = True, None
+
+	# Checking review is an item review
+	if flag:
+		flag, response = assert_resource_true(lambda id=0: True if Review.objects.get(id=id).reviewed_type == Item else False, **kwargs)
+
 	return flag, response
 
 
@@ -201,6 +226,16 @@ def cancelOrder(request, **kwargs):
 	# Checking sender is the order's customer
 	if flag:
 		flag, response = assert_sender_specific(request, order, 'customer')
+
+	return flag, response
+
+
+def sendItemReview(request, **kwargs):
+	flag, response = True, None
+
+	# Checking sender is a customer
+	if flag:
+		flag, response = assert_sender_is(request, 'Customer')
 
 	return flag, response
 

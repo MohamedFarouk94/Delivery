@@ -48,10 +48,21 @@ def make_order(self, region):
 
 def send_item_review(self, item, rating, text):
 	Review = self.REVIEW
-	Review.objects.create(reviewer=self, reviewed=item, rating=rating, text=text)
+
+	prev_reviews = [review for review in Review.objects.all()
+		if review.reviewer == self
+		and review.reviewed == item
+		and review.taken_in_calculation]
+
+	if len(prev_reviews):
+		assert len(prev_reviews) == 1
+		last_review = prev_reviews[0]
+		last_review.deactivate()
+		item = last_review.reviewed
+	return Review.objects.create(reviewer=self, reviewed=item, rating=rating, text=text)
 
 
 def send_order_review(self, order, rating, text):
 	order.raise_error_if_not_completed()
 	Review = self.REVIEW
-	Review.objects.create(reviewer=self, reviewed=order, rating=rating, text=text)
+	return Review.objects.create(reviewer=self, reviewed=order, rating=rating, text=text)
