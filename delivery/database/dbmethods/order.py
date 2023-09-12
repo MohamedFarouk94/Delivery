@@ -142,6 +142,57 @@ def cancel_order(self):
 	return self
 
 
+def assign_pilot(self, pilot):
+	self.raise_error_if_on_way()
+	self.raise_error_if_completed()
+	self.raise_error_if_canceled()
+	self.raise_error_if_problem()
+
+	self.pilot = pilot
+	self.date_pilot_assigned = dt.now()
+	self.status = ow
+
+	self.save()
+	return self
+
+
+def remove_pilot(self):
+	self.raise_error_if_completed()
+	self.raise_error_if_canceled()
+	self.raise_error_if_problem()
+
+	self.pilot = None
+	self.date_pilot_assigned = None
+	self.status = od
+
+	self.save()
+	return self
+
+
+def complete(self):
+	self.raise_error_if_completed()
+	self.raise_error_if_canceled()
+	self.raise_error_if_problem()
+
+	self.date_concluded = dt.now()
+	self.status = cm
+
+	self.save()
+	return self
+
+
+def problem(self):
+	self.raise_error_if_completed()
+	self.raise_error_if_canceled()
+	self.raise_error_if_problem()
+
+	self.date_concluded = dt.now()
+	self.status = pb
+
+	self.save()
+	return self
+
+
 def update_rating(self, r, from_whom='customer'):
 	self.raise_error_if_not_completed()
 
@@ -157,7 +208,7 @@ def undo_rating(self, r, from_whom='customer'):
 
 
 def know_this_person(self, person):
-	if self.status == od and person.category == 'Pilot' and person.region == self.region:
+	if self.status == od and person.category == 'Pilot' and person.get_region() == self.region:
 		return True
 
 	u1 = self.customer.user

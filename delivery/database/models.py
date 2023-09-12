@@ -12,6 +12,7 @@ class Person(models.Model):
 	ORDER = None
 	ITEM = None
 	REVIEW = None
+	CHILDREN = None
 
 	# id, first_name, last_name, username, email, password & date_joined are in User
 	user = models.OneToOneField(User, on_delete=models.CASCADE)
@@ -20,7 +21,7 @@ class Person(models.Model):
 	rating = models.FloatField(null=True, blank=True)
 	n_raters = models.IntegerField(default=0)
 
-	from .dbmethods.person import get_orders, to_dict
+	from .dbmethods.person import get_orders, get_region, to_dict
 	from .dbmethods.ratings import update_rating, undo_rating
 
 
@@ -39,8 +40,10 @@ class Customer(Person):
 class Pilot(Person):
 
 	region = models.CharField(max_length=20)
+	n_drops = models.IntegerField(default=0)
+	busy = models.BooleanField(default=False)
 
-	from .dbmethods.pilot import to_dict
+	from .dbmethods.pilot import get_available_orders, accept_order, drop_order, complete_order, report_order, to_dict
 
 
 class Item(models.Model):
@@ -77,6 +80,7 @@ class Order(models.Model):
 	from .dbmethods.order import raise_error_if_completed, raise_error_if_problem, raise_error_if_on_way, raise_error_if_canceled
 	from .dbmethods.order import get_basket, get_basket_item, get_quantity_of_item, edit_quantity_of_item, add_to_basket, remove_from_basket
 	from .dbmethods.order import get_delivery_fee, get_prices_sum, get_deserved_amount
+	from .dbmethods.order import assign_pilot, remove_pilot, complete, problem
 	from .dbmethods.order import make_order, cancel_order, update_rating, undo_rating, know_this_person, to_dict
 
 
@@ -102,6 +106,7 @@ class Review(models.Model):
 	reviewed_type = models.ForeignKey(ContentType, on_delete=models.CASCADE, related_name='REVIEWED')
 	reviewed = GenericForeignKey('reviewed_type', 'reviewed_id')
 
+	date_created = models.DateTimeField(auto_now_add=True)
 	text = models.TextField(blank=True)
 	rating = models.IntegerField(default=5, validators=[rating_validator])
 
@@ -119,6 +124,10 @@ if not Person.ITEM:
 if not Person.REVIEW:
 	print('Person.REVIEW')
 	Person.REVIEW = Review
+
+if not Person.CHILDREN:
+	print('Person.CHILDREN')
+	Person.CHILDREN = {'Customer': Customer, 'Pilot': Pilot}
 
 if not Order.BASKET_ITEM:
 	print('Order.BASKET_ITEM')

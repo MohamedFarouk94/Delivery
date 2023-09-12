@@ -141,3 +141,40 @@ def getOrders(request, **kwargs):
 @permission_classes([IsAuthenticated])
 def getOrder(request, **kwargs):
 	return check_auth_exec('getOrder', request, **kwargs)
+
+
+# Pilot Requests
+
+@api_view(['GET'])
+@authentication_classes([TokenAuthentication])
+@permission_classes([IsAuthenticated])
+def getAvailableOrders(request, **kwargs):
+	return check_auth_exec('getAvailableOrders', request, **kwargs)
+
+
+@api_view(['PATCH'])
+@authentication_classes([TokenAuthentication])
+@permission_classes([IsAuthenticated])
+def acceptOrder(request, **kwargs):
+	return check_auth_exec('acceptOrder', request, **kwargs)
+
+
+@api_view(['PATCH'])
+@authentication_classes([TokenAuthentication])
+@permission_classes([IsAuthenticated])
+def dropOrder(request, **kwargs):
+	return check_auth_exec('dropOrder', request, **kwargs)
+
+
+@api_view(['PATCH'])
+@authentication_classes([TokenAuthentication])
+@permission_classes([IsAuthenticated])
+def completeOrder(request, **kwargs):
+	return check_auth_exec('completeOrder', request, **kwargs)
+
+
+@api_view(['PATCH'])
+@authentication_classes([TokenAuthentication])
+@permission_classes([IsAuthenticated])
+def reportOrder(request, **kwargs):
+	return check_auth_exec('reportOrder', request, **kwargs)

@@ -242,3 +242,52 @@ def getOrder(request, **kwargs):
 		flag, response = assert_object_exists(Order, **kwargs)
 
 	return flag, response
+
+
+# Pilot Requests
+
+def getAvailableOrders(request, **kwargs):
+	flag, response = True, None
+
+	# Thers's no need to check anything
+	return flag, response
+
+
+def acceptOrder(request, **kwargs):
+	flag, response = True, None
+
+	# Checking that order exists
+	if flag:
+		flag, response = assert_object_exists(Order, **kwargs)
+
+	return flag, response
+
+
+def dropOrder(request, **kwargs):
+	flag, response = True, None
+
+	# Checking that order exists
+	if flag:
+		flag, response = assert_object_exists(Order, **kwargs)
+
+	return flag, response
+
+
+def completeOrder(request, **kwargs):
+	flag, response = True, None
+
+	# Checking that order exists
+	if flag:
+		flag, response = assert_object_exists(Order, **kwargs)
+
+	return flag, response
+
+
+def reportOrder(request, **kwargs):
+	flag, response = True, None
+
+	# Checking that order exists
+	if flag:
+		flag, response = assert_object_exists(Order, **kwargs)
+
+	return flag, response

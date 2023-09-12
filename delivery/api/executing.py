@@ -1,4 +1,4 @@
-from database.models import Person, Item, Seller, Customer, Order
+from database.models import Person, Item, Seller, Customer, Pilot, Order
 from rest_framework.response import Response
 from django.http import HttpResponseBadRequest
 from django.core.exceptions import ValidationError
@@ -255,6 +255,78 @@ def getOrder(request, **kwargs):
 	order = Order.objects.get(id=kwargs['id'])
 	try:
 		return True, Response(order.to_dict())
+	except Exception as e:
+		print('#UNKNOWN ERROR#', str(e))
+		return False, HttpResponseBadRequest('{"details": "Something wrong happened"}')
+
+
+# Pilot Requests
+
+def getAvailableOrders(request, **kwargs):
+	pilot = Pilot.objects.get(user=request.user)
+	try:
+		orders = pilot.get_available_orders()
+		return True, Response(list_to_dict(orders))
+	except Exception as e:
+		print('#UNKNOWN ERROR#', str(e))
+		return False, HttpResponseBadRequest('{"details": "Something wrong happened"}')
+
+
+def acceptOrder(request, **kwargs):
+	pilot = Pilot.objects.get(user=request.user)
+	order = Order.objects.get(id=kwargs['id'])
+	try:
+		order = pilot.accept_order(order)
+		return True, Response(order.to_dict())
+	except AssertionError:
+		return False, HttpResponseBadRequest('{"details": "Pilot cannot take more than one order in a time."}')
+	except OrderException:
+		return False, HttpResponseBadRequest('{"details": "Order is already taken."}')
+	except Exception as e:
+		print('#UNKNOWN ERROR#', str(e))
+		return False, HttpResponseBadRequest('{"details": "Something wrong happened"}')
+
+
+def dropOrder(request, **kwargs):
+	pilot = Pilot.objects.get(user=request.user)
+	order = Order.objects.get(id=kwargs['id'])
+	try:
+		order = pilot.drop_order(order)
+		return True, Response(order.to_dict())
+	except AssertionError:
+		return False, HttpResponseBadRequest('{"details": "Order cannot be dropped by the sender."}')
+	except OrderException:
+		return False, HttpResponseBadRequest('{"details": "Order cannot be dropped."}')
+	except Exception as e:
+		print('#UNKNOWN ERROR#', str(e))
+		return False, HttpResponseBadRequest('{"details": "Something wrong happened"}')
+
+
+def completeOrder(request, **kwargs):
+	pilot = Pilot.objects.get(user=request.user)
+	order = Order.objects.get(id=kwargs['id'])
+	try:
+		order = pilot.complete_order(order)
+		return True, Response(order.to_dict())
+	except AssertionError:
+		return False, HttpResponseBadRequest('{"details": "Order cannot be completed by the sender."}')
+	except OrderException:
+		return False, HttpResponseBadRequest('{"details": "Order cannot be completed."}')
+	except Exception as e:
+		print('#UNKNOWN ERROR#', str(e))
+		return False, HttpResponseBadRequest('{"details": "Something wrong happened"}')
+
+
+def reportOrder(request, **kwargs):
+	pilot = Pilot.objects.get(user=request.user)
+	order = Order.objects.get(id=kwargs['id'])
+	try:
+		order = pilot.report_order(order)
+		return True, Response(order.to_dict())
+	except AssertionError:
+		return False, HttpResponseBadRequest('{"details": "Order cannot be reported by the sender."}')
+	except OrderException:
+		return False, HttpResponseBadRequest('{"details": "Order cannot be reported."}')
 	except Exception as e:
 		print('#UNKNOWN ERROR#', str(e))
 		return False, HttpResponseBadRequest('{"details": "Something wrong happened"}')

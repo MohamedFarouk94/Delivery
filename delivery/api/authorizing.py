@@ -226,3 +226,75 @@ def getOrder(request, **kwargs):
 		flag, response = assert_sender_true(request, lambda r: order.know_this_person(Person.objects.get(user=r.user)))
 
 	return flag, response
+
+
+# Pilot Requests
+
+def getAvailableOrders(request, **kwargs):
+	flag, response = True, None
+
+	# Checking sender is a pilot
+	if flag:
+		flag, response = assert_sender_is(request, 'Pilot')
+
+	return flag, response
+
+
+def acceptOrder(request, **kwargs):
+	order = Order.objects.get(id=kwargs['id'])
+	flag, response = True, None
+
+	# Checking sender is a pilot
+	if flag:
+		flag, response = assert_sender_is(request, 'Pilot')
+
+	# Checking sender is related to order
+	if flag:
+		flag, response = assert_sender_true(request, lambda r: order.know_this_person(Person.objects.get(user=r.user)))
+
+	return flag, response
+
+
+def dropOrder(request, **kwargs):
+	order = Order.objects.get(id=kwargs['id'])
+	flag, response = True, None
+
+	# Checking sender is a pilot
+	if flag:
+		flag, response = assert_sender_is(request, 'Pilot')
+
+	# Checking sender is related to order
+	if flag:
+		flag, response = assert_sender_true(request, lambda r: order.know_this_person(Person.objects.get(user=r.user)))
+
+	return flag, response
+
+
+def completeOrder(request, **kwargs):
+	order = Order.objects.get(id=kwargs['id'])
+	flag, response = True, None
+
+	# Checking sender is a pilot
+	if flag:
+		flag, response = assert_sender_is(request, 'Pilot')
+
+	# Checking sender is related to order
+	if flag:
+		flag, response = assert_sender_true(request, lambda r: order.know_this_person(Person.objects.get(user=r.user)))
+
+	return flag, response
+
+
+def reportOrder(request, **kwargs):
+	order = Order.objects.get(id=kwargs['id'])
+	flag, response = True, None
+
+	# Checking sender is a pilot
+	if flag:
+		flag, response = assert_sender_is(request, 'Pilot')
+
+	# Checking sender is related to order
+	if flag:
+		flag, response = assert_sender_true(request, lambda r: order.know_this_person(Person.objects.get(user=r.user)))
+
+	return flag, response

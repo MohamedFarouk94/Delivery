@@ -25,4 +25,9 @@ urlpatterns = [
 	path('orders', views.getOrders, name='getOrders'),
 	path('orders/<int:id>', views.getOrder, name='getOrder'),
 	path('orders/<int:id>/cancel', views.cancelOrder, name='cancelOrder'),
+	path('available-orders', views.getAvailableOrders, name='getAvailableOrders'),
+	path('orders/<int:id>/accept', views.acceptOrder, name='acceptOrder'),
+	path('orders/<int:id>/drop', views.dropOrder, name='dropOrder'),
+	path('orders/<int:id>/complete', views.completeOrder, name='completeOrder'),
+	path('orders/<int:id>/report', views.reportOrder, name='reportOrder'),
 ]

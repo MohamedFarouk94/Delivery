@@ -1,5 +1,12 @@
 # methods for class Person in database/models.py
 
+def get_region(self):
+	if self.category != 'Pilot':
+		raise AttributeError('This person has no region attribute')
+
+	return self.CHILDREN['Pilot'].objects.get(user=self.user).region
+
+
 def get_orders(self):
 	Order = self.ORDER
 
