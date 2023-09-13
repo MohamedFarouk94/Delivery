@@ -219,6 +219,35 @@ def know_this_person(self, person):
 	return False
 
 
+def is_reviewed_by(self, model):
+	Review = self.REVIEW
+
+	order_reviews = Review.objects.filter(reviewed_type__model='order')
+	this_order_reviews = [review for review in order_reviews if review.reviewed == self]
+	meant_review = [review for review in this_order_reviews if review.reviewer_type.model == model]
+	if len(meant_review):
+		return True
+	return False
+
+
+def is_reviewed_by_customer(self):
+	return self.is_reviewed_by('customer')
+
+
+def is_reviewed_by_pilot(self):
+	return self.is_reviewed_by('pilot')
+
+
+def raise_error_if_reviewed_by_customer(self):
+	if self.is_reviewed_by_customer():
+		raise OrderException('This order is already reviewed by a customer.')
+
+
+def raise_error_if_reviewed_by_pilot(self):
+	if self.is_reviewed_by_pilot():
+		raise OrderException('This order is already reviewed by a pilot.')
+
+
 def to_dict(self):
 	return {
 		'id': self.id,

@@ -41,6 +41,12 @@ def edit(self, **kwargs):
 	return self
 
 
+def get_reviews(self):
+	Review = self.REVIEW
+
+	return [review for review in Review.objects.filter(reviewed_type__model='item') if review.reviewed == self]
+
+
 def to_dict(self):
 	return {
 		'id': self.id,

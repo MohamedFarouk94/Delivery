@@ -21,7 +21,7 @@ class Person(models.Model):
 	rating = models.FloatField(null=True, blank=True)
 	n_raters = models.IntegerField(default=0)
 
-	from .dbmethods.person import get_orders, get_region, to_dict
+	from .dbmethods.person import get_orders, get_region, send_order_review, to_dict
 	from .dbmethods.ratings import update_rating, undo_rating
 
 
@@ -35,6 +35,7 @@ class Customer(Person):
 	from .dbmethods.customer import get_orders, get_pending_order, create_pending_order
 	from .dbmethods.customer import get_basket, get_basket_item, edit_quantity_of_item, add_to_basket, remove_from_basket
 	from .dbmethods.customer import make_order, send_item_review, send_order_review
+	from .dbmethods.customer import get_active_item_review, get_last_item_review, delete_item_review
 
 
 class Pilot(Person):
@@ -43,11 +44,12 @@ class Pilot(Person):
 	n_drops = models.IntegerField(default=0)
 	busy = models.BooleanField(default=False)
 
-	from .dbmethods.pilot import get_available_orders, accept_order, drop_order, complete_order, report_order, to_dict
+	from .dbmethods.pilot import get_available_orders, accept_order, drop_order, complete_order, report_order, send_order_review, to_dict
 
 
 class Item(models.Model):
 	editable_attributes = ['name', 'description', 'price']
+	REVIEW = None
 
 	id = models.BigAutoField(primary_key=True)
 	name = models.CharField(max_length=50)
@@ -60,7 +62,7 @@ class Item(models.Model):
 	n_buyouts = models.IntegerField(default=0)
 	image = models.ImageField(default='no_image_available.jpg')  # Assign image by path after 'images/' (not including images/)
 
-	from .dbmethods.item import display_image, get_b64img, set_image, assign_image, edit, to_dict, save
+	from .dbmethods.item import display_image, get_b64img, set_image, assign_image, edit, get_reviews, to_dict, save
 	from .dbmethods.ratings import update_rating, undo_rating
 
 
@@ -81,6 +83,8 @@ class Order(models.Model):
 	from .dbmethods.order import get_basket, get_basket_item, get_quantity_of_item, edit_quantity_of_item, add_to_basket, remove_from_basket
 	from .dbmethods.order import get_delivery_fee, get_prices_sum, get_deserved_amount
 	from .dbmethods.order import assign_pilot, remove_pilot, complete, problem
+	from .dbmethods.order import is_reviewed_by, is_reviewed_by_customer, is_reviewed_by_pilot
+	from .dbmethods.order import raise_error_if_reviewed_by_customer, raise_error_if_reviewed_by_pilot
 	from .dbmethods.order import make_order, cancel_order, update_rating, undo_rating, know_this_person, to_dict
 
 
@@ -111,7 +115,7 @@ class Review(models.Model):
 	text = models.TextField(blank=True)
 	rating = models.IntegerField(default=5, validators=[rating_validator])
 
-	from .dbmethods.review import deactivate, to_dict, save, delete
+	from .dbmethods.review import deactivate, activate, to_dict, save, delete
 
 
 if not Person.ORDER:
@@ -128,7 +132,11 @@ if not Person.REVIEW:
 
 if not Person.CHILDREN:
 	print('Person.CHILDREN')
-	Person.CHILDREN = {'Customer': Customer, 'Pilot': Pilot}
+	Person.CHILDREN = {'Seller': Seller, 'Customer': Customer, 'Pilot': Pilot}
+
+if not Item.REVIEW:
+	print('Item.REVIEW')
+	Item.REVIEW = Review
 
 if not Order.BASKET_ITEM:
 	print('Order.BASKET_ITEM')

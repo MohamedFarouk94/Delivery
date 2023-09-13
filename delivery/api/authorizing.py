@@ -77,6 +77,13 @@ def getItem(request, **kwargs):
 	return flag, response
 
 
+def getReviewsOfItem(request, **kwargs):
+	flag, response = True, None
+
+	# There's no need to authorize anything
+	return flag, response
+
+
 def getImage(request, **kwargs):
 	flag, response = True, None
 
@@ -240,6 +247,17 @@ def sendItemReview(request, **kwargs):
 	return flag, response
 
 
+def deleteItemReview(request, **kwargs):
+	review = Review.objects.get(id=kwargs['id'])
+	flag, response = True, None
+
+	# Checking sender is the review reviewer
+	if flag:
+		flag, response = assert_sender_specific(request, review, 'reviewer')
+
+	return flag, response
+
+
 # Customer & Pilot Requests
 
 def getOrders(request, **kwargs):
@@ -253,6 +271,17 @@ def getOrders(request, **kwargs):
 
 
 def getOrder(request, **kwargs):
+	order = Order.objects.get(id=kwargs['id'])
+	flag, response = True, None
+
+	# Checking sender is related to order
+	if flag:
+		flag, response = assert_sender_true(request, lambda r: order.know_this_person(Person.objects.get(user=r.user)))
+
+	return flag, response
+
+
+def sendOrderReview(request, **kwargs):
 	order = Order.objects.get(id=kwargs['id'])
 	flag, response = True, None
 

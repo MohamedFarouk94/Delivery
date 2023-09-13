@@ -3,7 +3,6 @@ from rest_framework.response import Response
 from django.http import HttpResponseBadRequest
 from django.core.exceptions import ValidationError
 from database.exceptions import BasketException, OrderException
-from django.contrib.contenttypes.models import ContentType
 
 
 # utils
@@ -55,6 +54,16 @@ def getItem(request, **kwargs):
 	item = Item.objects.get(id=kwargs['id'])
 	try:
 		return True, Response(item.to_dict())
+	except Exception as e:
+		print('#UNKNOWN ERROR#', str(e))
+		return False, HttpResponseBadRequest('{"details": "Something wrong happened"}')
+
+
+def getReviewsOfItem(request, **kwargs):
+	item = Item.objects.get(id=kwargs['id'])
+	try:
+		reviews = item.get_reviews()
+		return True, Response(list_to_dict(reviews))
 	except Exception as e:
 		print('#UNKNOWN ERROR#', str(e))
 		return False, HttpResponseBadRequest('{"details": "Something wrong happened"}')
@@ -275,6 +284,17 @@ def sendItemReview(request, **kwargs):
 		return False, HttpResponseBadRequest('{"details": "Something wrong happened"}')
 
 
+def deleteItemReview(request, **kwargs):
+	review = Review.objects.get(id=kwargs['id'])
+	customer = Customer.objects.get(user=request.user)
+	try:
+		review = customer.delete_item_review(review)
+		return True, Response(review.to_dict())
+	except Exception as e:
+		print('#UNKNOWN ERROR#', str(e))
+		return False, HttpResponseBadRequest('{"details": "Something wrong happened"}')
+
+
 # Customer & Pilot Requests
 
 def getOrders(request, **kwargs):
@@ -291,6 +311,21 @@ def getOrder(request, **kwargs):
 	order = Order.objects.get(id=kwargs['id'])
 	try:
 		return True, Response(order.to_dict())
+	except Exception as e:
+		print('#UNKNOWN ERROR#', str(e))
+		return False, HttpResponseBadRequest('{"details": "Something wrong happened"}')
+
+
+def sendOrderReview(request, **kwargs):
+	order = Order.objects.get(id=kwargs['id'])
+	person = Person.objects.get(user=request.user)
+	rating = request.data['rating']
+	text = request.data['text']
+	try:
+		review = person.send_order_review(order, rating, text)
+		return True, Response(review.to_dict())
+	except OrderException:
+		return False, HttpResponseBadRequest('{"details": "This order cannot be reviewed."}')
 	except Exception as e:
 		print('#UNKNOWN ERROR#', str(e))
 		return False, HttpResponseBadRequest('{"details": "Something wrong happened"}')

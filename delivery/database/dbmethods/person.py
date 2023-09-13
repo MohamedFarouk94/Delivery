@@ -18,6 +18,14 @@ def get_orders(self):
 	return Order.objects.filter(**kwargs)
 
 
+def send_order_review(self, order, rating, text):
+	if self.category == 'Seller':
+		raise AttributeError('Seller object has no attribute orders.')
+
+	pilot_or_customer = self.CHILDREN[self.category].objects.get(user=self.user)
+	return pilot_or_customer.send_order_review(order, rating, text)
+
+
 def to_dict(self):
 	return {
 		'id': self.user.id,

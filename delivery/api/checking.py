@@ -71,6 +71,16 @@ def getItem(request, **kwargs):
 	return flag, response
 
 
+def getReviewsOfItem(request, **kwargs):
+	flag, response = True, None
+
+	# Checking that item exists
+	if flag:
+		flag, response = assert_object_exists(Item, **kwargs)
+
+	return flag, response
+
+
 def getImage(request, **kwargs):
 	flag, response = True, None
 
@@ -256,6 +266,16 @@ def sendItemReview(request, **kwargs):
 	return flag, response
 
 
+def deleteItemReview(request, **kwargs):
+	flag, response = True, None
+
+	# Checking that review exists
+	if flag:
+		flag, response = assert_object_exists(Review, **kwargs)
+
+	return flag, response
+
+
 # Customer & Pilot Requests
 
 def getOrders(request, **kwargs):
@@ -271,6 +291,20 @@ def getOrder(request, **kwargs):
 	# Checking that order exists
 	if flag:
 		flag, response = assert_object_exists(Order, **kwargs)
+
+	return flag, response
+
+
+def sendOrderReview(request, **kwargs):
+	flag, response = True, None
+
+	# Checking that order exists
+	if flag:
+		flag, response = assert_object_exists(Order, **kwargs)
+
+	# Checking data contains rating & text
+	if flag:
+		flag, response = assert_attributes_contain(['rating', 'text'], request.data)
 
 	return flag, response
 
