@@ -1,7 +1,15 @@
 from rest_framework.decorators import api_view, permission_classes, authentication_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.authentication import TokenAuthentication
+from . import login_and_signup
 from .check_auth_exec import check_auth_exec
+
+
+# Login and Sign up
+
+@api_view(['GET'])
+def login(request, **kwargs):
+	return login_and_signup.login(request)
 
 
 # General Requests
