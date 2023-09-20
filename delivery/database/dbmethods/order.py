@@ -251,14 +251,14 @@ def raise_error_if_reviewed_by_pilot(self):
 def to_dict(self):
 	return {
 		'id': self.id,
-		'customer-id': self.customer.user.id,
-		'customer-username': self.customer.user.username,
-		'pilot-id': self.pilot.user.id if self.pilot else 'N/A',
-		'pilot-username': self.pilot.user.username if self.pilot else 'N/A',
+		'customerId': self.customer.user.id,
+		'customerUsername': self.customer.user.username,
+		'pilotId': self.pilot.user.id if self.pilot else 'N/A',
+		'pilotUsername': self.pilot.user.username if self.pilot else 'N/A',
 		'status': self.status,
-		'total-price': self.get_deserved_amount(),
+		'totalPrice': self.get_deserved_amount(),
 		'region': self.region if self.region else 'N/A',
-		'date-ordered': self.date_ordered if self.date_ordered else 'N/A',
-		'date-pilot-assigned': self.date_pilot_assigned if self.date_pilot_assigned else 'N/A',
-		'date-concluded': self.date_concluded if self.date_concluded else 'N/A'
+		'dateOrdered': self.date_ordered if self.date_ordered else 'N/A',
+		'datePilotAssigned': self.date_pilot_assigned if self.date_pilot_assigned else 'N/A',
+		'dateConcluded': self.date_concluded if self.date_concluded else 'N/A'
 	}

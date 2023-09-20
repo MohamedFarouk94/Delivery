@@ -51,13 +51,13 @@ def to_dict(self):
 	return {
 		'id': self.id,
 		'name': self.name,
-		'seller-id': self.seller.user.id,
-		'seller-username': self.seller.user.username,
+		'sellerId': self.seller.user.id,
+		'sellerUsername': self.seller.user.username,
 		'description': self.description,
 		'price': self.price,
 		'image': self.image.url,
 		'rating': self.rating,
-		'number-of-raters': self.n_raters,
-		'number-of-orders': self.n_orders,
-		'number-of-buyouts': self.n_buyouts,
+		'numberOfRaters': self.n_raters,
+		'numberOfOrders': self.n_orders,
+		'numberOfBuyouts': self.n_buyouts,
 	}

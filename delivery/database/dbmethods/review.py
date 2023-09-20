@@ -30,12 +30,12 @@ def activate(self):
 def to_dict(self):
 	return {
 		'id': self.id,
-		'date-created': self.date_created,
-		'reviewer-type': self.reviewer.__class__.__name__,
-		'reviewed-type': self.reviewed.__class__.__name__,
-		'reviewer-id': self.reviewer.user.id,
-		'reviewed-id': self.reviewed.pk,
-		'taken-in-calculation': self.taken_in_calculation,
+		'dateCreated': self.date_created,
+		'reviewerType': self.reviewer.__class__.__name__,
+		'reviewedType': self.reviewed.__class__.__name__,
+		'reviewerId': self.reviewer.user.id,
+		'reviewedId': self.reviewed.pk,
+		'takenInCalculation': self.taken_in_calculation,
 		'rating': self.rating,
 		'text': self.text
 	}

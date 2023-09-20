@@ -20,11 +20,11 @@ def get_deserved_amount(self):
 def to_dict(self):
 	return {
 		'id': self.id,
-		'customer-id': self.order.customer.user.id,
-		'customer-username': self.order.customer.user.username,
-		'order-id': self.order.id,
-		'item-id': self.item.id,
-		'item-name': self.item.name,
+		'customerId': self.order.customer.user.id,
+		'customerUsername': self.order.customer.user.username,
+		'orderId': self.order.id,
+		'itemId': self.item.id,
+		'itemName': self.item.name,
 		'quantity': self.quantity,
-		'total-price': self.get_deserved_amount()
+		'totalPrice': self.get_deserved_amount()
 	}
