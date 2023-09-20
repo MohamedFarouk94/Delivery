@@ -68,8 +68,11 @@ fun DrawLoginLayout() {
         
         Button(onClick = { coroutineScope.launch {
             val loginObject = login(category = userTypeState.value, username = usernameState.value, password = passwordState.value)
+            // val loginObject = LoginObject(token="TemporaryToken")
             if(loginObject.message == "ok"){
-                context.startActivity(Intent(context, HomeActivity::class.java).also { it.putExtra("Token", loginObject.token) })
+                context.startActivity(Intent(context, HomeActivity::class.java).also {
+                    it.putExtra("Token", loginObject.token)
+                    it.putExtra("Category", userTypeState.value) })
                 (context as Activity).finish()
             }
             else {
