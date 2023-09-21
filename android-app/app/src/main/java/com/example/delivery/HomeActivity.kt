@@ -27,32 +27,64 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
 import com.example.delivery.ui.theme.DeliveryTheme
+import io.ktor.client.call.body
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import java.net.ConnectException
 
 class HomeActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         val token = intent.getStringExtra("Token")
-        val category = intent.getStringExtra("Category")
-        if (token != null) Log.d("home", token)
-        if (category != null) Log.d("home", category)
         super.onCreate(savedInstanceState)
 
         setContent {
             val drawerState = rememberDrawerState(DrawerValue.Closed)
             val coroutineScope = rememberCoroutineScope()
+            var person by remember { mutableStateOf(Person()) }
 
-            DrawHomeLayout(drawerState = drawerState, coroutineScope = coroutineScope, category = category)
+            LaunchedEffect(Unit){ coroutineScope.launch { person = token?.let { whoAmI(it) }!! } }
+
+            DrawHomeLayout(drawerState = drawerState, coroutineScope = coroutineScope, person = person)
             }
         }
     }
+
+@kotlinx.serialization.Serializable
+class Person(
+        val message: String = "ok",
+         val id: Int = 0,
+         val category: String = "",
+         val firstName: String = "",
+         val lastName: String = "",
+         val username: String = "",
+         val status: String = "",
+         val email: String = "",
+         val dateJoined: String = ""
+)
+
+
+suspend fun whoAmI(token: String): Person{
+    val url = "http://192.168.1.9:8000/who-am-i"
+    val person: Person = try{
+        val response = sendHttpResponse(url = url, token = token, body = HashMap<String, String>())
+        if (response.status.value in 200..299) response.body() else Person(message = "Unauthorized.")
+    } catch (exception: ConnectException){
+        Person(message = "Connection Error.")
+    }
+    return person
+}
 
 fun createMenuLists(category: String): List<MenuItem>{
     if(category == "Customer")
@@ -76,7 +108,7 @@ fun createMenuLists(category: String): List<MenuItem>{
 }
 
 @Composable
-fun DrawHomeLayout(drawerState: DrawerState, coroutineScope: CoroutineScope, category: String?){
+fun DrawHomeLayout(drawerState: DrawerState, coroutineScope: CoroutineScope, person: Person){
     ModalNavigationDrawer(
         drawerState = drawerState,
         drawerContent = {
@@ -86,8 +118,8 @@ fun DrawHomeLayout(drawerState: DrawerState, coroutineScope: CoroutineScope, cat
                     .fillMaxWidth(0.7f)
                     .background(White)
             ){
-                MenuHeader()
-                MenuBody(items = createMenuLists(category!!))
+                MenuHeader(person)
+                MenuBody(items = createMenuLists(person.category!!))
             }
         }){
         Scaffold(
