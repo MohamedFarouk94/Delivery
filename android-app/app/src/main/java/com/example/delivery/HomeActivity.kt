@@ -1,5 +1,7 @@
 package com.example.delivery
 
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
@@ -36,6 +38,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color.Companion.White
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
 import com.example.delivery.ui.theme.DeliveryTheme
@@ -56,13 +59,13 @@ class HomeActivity : ComponentActivity() {
 
             LaunchedEffect(Unit){ coroutineScope.launch { person = token?.let { whoAmI(it) }!! } }
 
-            DrawHomeLayout(drawerState = drawerState, coroutineScope = coroutineScope, person = person)
+            DrawHomeLayout(drawerState = drawerState, coroutineScope = coroutineScope, token = token!!, person = person)
             }
         }
     }
 
 @kotlinx.serialization.Serializable
-class Person(
+open class Person(
         val message: String = "ok",
          val id: Int = 0,
          val category: String = "",
@@ -86,12 +89,12 @@ suspend fun whoAmI(token: String): Person{
     return person
 }
 
-fun createMenuLists(category: String): List<MenuItem>{
+fun createMenuLists(context: Context, coroutineScope: CoroutineScope, drawerState: DrawerState, token: String, category: String): List<MenuItem>{
     if(category == "Customer")
         return listOf(
             MenuItem("Profile", Icons.Default.Person) { Log.d("home", "profile") },
             MenuItem("Orders", Icons.Default.List) { Log.d("home", "orders") },
-            MenuItem("Shop", Icons.Default.Store) { Log.d("home", "shop") },
+            MenuItem("Shop", Icons.Default.Store) { coroutineScope.launch { drawerState.close() }; context.startActivity(Intent(context, ShopSellersActivity::class.java).also { it.putExtra("Token", token) }) },
             MenuItem("Basket", Icons.Default.ShoppingBasket) { Log.d("home", "basket") },
             MenuItem("Shortlist", Icons.Default.Bookmarks) { Log.d("home", "shortlist") },
             MenuItem("Help", Icons.Default.Help) { Log.d("home", "help") },
@@ -108,7 +111,7 @@ fun createMenuLists(category: String): List<MenuItem>{
 }
 
 @Composable
-fun DrawHomeLayout(drawerState: DrawerState, coroutineScope: CoroutineScope, person: Person){
+fun DrawHomeLayout(drawerState: DrawerState, coroutineScope: CoroutineScope, person: Person, token: String){
     ModalNavigationDrawer(
         drawerState = drawerState,
         drawerContent = {
@@ -119,7 +122,7 @@ fun DrawHomeLayout(drawerState: DrawerState, coroutineScope: CoroutineScope, per
                     .background(White)
             ){
                 MenuHeader(person)
-                MenuBody(items = createMenuLists(person.category!!))
+                MenuBody(items = createMenuLists(LocalContext.current, coroutineScope, drawerState, token, person.category))
             }
         }){
         Scaffold(
