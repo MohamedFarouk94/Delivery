@@ -27,7 +27,10 @@ class Person(models.Model):
 
 class Seller(Person):
 
-	from .dbmethods.seller import get_items, add_item, delete_item, edit_item, set_image
+	image = models.ImageField(default='no_image_available.jpg')  # Assign image by path after 'images/' (not including images/)
+
+	from .dbmethods.seller import get_items, add_item, delete_item, edit_item, set_item_image, to_dict
+	from .dbmethods.images import display_image, get_b64img, set_image, assign_image
 
 
 class Customer(Person):
@@ -62,8 +65,9 @@ class Item(models.Model):
 	n_buyouts = models.IntegerField(default=0)
 	image = models.ImageField(default='no_image_available.jpg')  # Assign image by path after 'images/' (not including images/)
 
-	from .dbmethods.item import display_image, get_b64img, set_image, assign_image, edit, get_reviews, to_dict, save
+	from .dbmethods.item import edit, get_reviews, to_dict, save
 	from .dbmethods.ratings import update_rating, undo_rating
+	from .dbmethods.images import display_image, get_b64img, set_image, assign_image
 
 
 class Order(models.Model):

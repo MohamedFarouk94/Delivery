@@ -171,7 +171,7 @@ def setImage(request, **kwargs):
 	seller = Seller.objects.get(user=request.user)
 	b64img = request.data['b64img'].encode('utf-8')
 	try:
-		item = seller.set_image(item, b64img)
+		item = seller.set_item_image(item, b64img)
 		return True, Response(item.to_dict())
 	except Exception as e:
 		print('#UNKNOWN ERROR#', str(e))

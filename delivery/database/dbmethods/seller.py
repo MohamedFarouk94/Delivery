@@ -19,7 +19,7 @@ def edit_item(self, item, **kwargs):
 	return item.edit(**kwargs)
 
 
-def set_image(self, item, b64img):
+def set_item_image(self, item, b64img):
 	assert item.seller == self
 	return item.set_image(b64img)
 
@@ -28,3 +28,9 @@ def delete_item(self, item):
 	assert item.seller == self
 	item.delete()
 	return item
+
+
+def to_dict(self):
+	super_dict = super(self.__class__, self).to_dict()
+	super_dict['image'] = self.get_b64img()
+	return super_dict
