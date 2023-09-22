@@ -25,6 +25,7 @@
         </activity>
         <activity android:name=".HomeActivity"> </activity>
         <activity android:name=".ShopSellersActivity"> </activity>
+        <activity android:name=".ShopItemsActivity"> </activity>
     </application>
 
 </manifest>

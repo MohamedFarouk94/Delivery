@@ -26,7 +26,7 @@ def to_dict(self):
 		'sellerUsername': self.seller.user.username,
 		'description': self.description,
 		'price': self.price,
-		'image': self.image.url,
+		'image': self.get_b64img(),
 		'rating': self.rating,
 		'numberOfRaters': self.n_raters,
 		'numberOfOrders': self.n_orders,

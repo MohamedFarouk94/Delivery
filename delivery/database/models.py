@@ -38,7 +38,7 @@ class Customer(Person):
 	from .dbmethods.customer import get_orders, get_pending_order, create_pending_order
 	from .dbmethods.customer import get_basket, get_basket_item, edit_quantity_of_item, add_to_basket, remove_from_basket
 	from .dbmethods.customer import make_order, send_item_review, send_order_review
-	from .dbmethods.customer import get_active_item_review, get_last_item_review, delete_item_review
+	from .dbmethods.customer import get_item_review
 
 
 class Pilot(Person):
@@ -115,11 +115,10 @@ class Review(models.Model):
 	reviewed = GenericForeignKey('reviewed_type', 'reviewed_id')
 
 	date_created = models.DateTimeField(auto_now_add=True)
-	taken_in_calculation = models.BooleanField(default=True)
 	text = models.TextField(blank=True)
 	rating = models.IntegerField(default=5, validators=[rating_validator])
 
-	from .dbmethods.review import deactivate, activate, to_dict, save, delete
+	from .dbmethods.review import to_dict, save, delete
 
 
 if not Person.ORDER:

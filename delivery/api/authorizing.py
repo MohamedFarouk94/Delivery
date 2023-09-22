@@ -77,7 +77,7 @@ def getItem(request, **kwargs):
 	return flag, response
 
 
-def getReviewsOfItem(request, **kwargs):
+def getAllItemReviews(request, **kwargs):
 	flag, response = True, None
 
 	# There's no need to authorize anything
@@ -112,20 +112,10 @@ def getSellerItems(request, **kwargs):
 	return flag, response
 
 
-def getItemReviews(request, **kwargs):
+def getReviewsOfAnItem(request, **kwargs):
 	flag, response = True, None
 
 	# There's no need to authorize anything
-	return flag, response
-
-
-def getItemReview(request, **kwargs):
-	flag, response = True, None
-
-	# Checking review is an item review
-	if flag:
-		flag, response = assert_resource_true(lambda id=0: True if Review.objects.get(id=id).reviewed_type == Item else False, **kwargs)
-
 	return flag, response
 
 
@@ -237,6 +227,16 @@ def cancelOrder(request, **kwargs):
 	return flag, response
 
 
+def getMyItemReview(request, **kwargs):
+	flag, response = True, None
+
+	# Checking sender is a customer
+	if flag:
+		flag, response = assert_sender_is(request, 'Customer')
+
+	return flag, response
+
+
 def sendItemReview(request, **kwargs):
 	flag, response = True, None
 
@@ -247,7 +247,7 @@ def sendItemReview(request, **kwargs):
 	return flag, response
 
 
-def deleteItemReview(request, **kwargs):
+def deleteMyItemReview(request, **kwargs):
 	review = Review.objects.get(id=kwargs['id'])
 	flag, response = True, None
 

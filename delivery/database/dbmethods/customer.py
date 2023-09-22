@@ -1,5 +1,5 @@
 from database.strings import pn
-from database.exceptions import OrderException
+from database.exceptions import OrderException, ReviewException
 
 
 def get_orders(self):
@@ -46,50 +46,31 @@ def make_order(self, region):
 	return ordered
 
 
-def get_last_item_review(self, item):
-	Review = self.REVIEW
-
-	prev_reviews = [review for review in Review.objects.filter(reviewed_type__model='item')
-		if review.reviewer == self
-		and review.reviewed == item]
-
-	if not len(prev_reviews):
-		return None
-
-	return sorted(prev_reviews, key=lambda x: x.id)[-1]
+def raise_error_if_item_reviewed(self, item):
+	try:
+		self.get_item_review(item)
+	except ReviewException:
+		return
+	raise ReviewException("This item is already reviewed by this customer.")
 
 
-def get_active_item_review(self, item):
-	prev_reviews = [review for review in item.get_reviews()
-		if review.reviewer == self
-		and review.reviewed == item
-		and review.taken_in_calculation]
-
-	assert len(prev_reviews) <= 1
-
-	if not len(prev_reviews):
-		return None
-
-	return prev_reviews[0]
+def get_item_review(self, item):
+	reviews = item.get_reviews()
+	try:
+		[review for review in reviews if review.reviewer == self][0]
+	except IndexError:
+		raise ReviewException('This item is not reviewed by this customer.')
 
 
 def send_item_review(self, item, rating, text):
+	self.raise_error_if_item_reviewed(item)
 	Review = self.REVIEW
-
-	active_review = self.get_active_item_review(item)
-	if active_review:
-		active_review.deactivate()
-		item = active_review.reviewed
-
 	return Review.objects.create(reviewer=self, reviewed=item, rating=rating, text=text)
 
 
-def delete_item_review(self, review):
+def delete_item_review(self, item):
+	review = self.get_item_review(item)
 	review.delete()
-	if review.taken_in_calculation:
-		last_review = self.get_last_item_review(review.reviewed)
-		if last_review:
-			last_review.activate()
 	return review
 
 

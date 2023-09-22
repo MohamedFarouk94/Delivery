@@ -71,13 +71,10 @@ def getItem(request, **kwargs):
 	return flag, response
 
 
-def getReviewsOfItem(request, **kwargs):
+def getAllItemReviews(request, **kwargs):
 	flag, response = True, None
 
-	# Checking that item exists
-	if flag:
-		flag, response = assert_object_exists(Item, **kwargs)
-
+	# Thers's no need to check anything
 	return flag, response
 
 
@@ -118,20 +115,10 @@ def getSellerItems(request, **kwargs):
 	return flag, response
 
 
-def getItemReviews(request, **kwargs):
+def getReviewsOfAnItem(request, **kwargs):
 	flag, response = True, None
 
 	# Thers's no need to check anything
-	return flag, response
-
-
-def getItemReview(request, **kwargs):
-	flag, response = True, None
-
-	# Checking that review exists
-	if flag:
-		flag, response = assert_object_exists(Review, **kwargs)
-
 	return flag, response
 
 
@@ -252,6 +239,16 @@ def cancelOrder(request, **kwargs):
 	return flag, response
 
 
+def getMyItemReview(request, **kwargs):
+	flag, response = True, None
+
+	# Checking that item exists
+	if flag:
+		flag, response = assert_object_exists(Item, **kwargs)
+
+	return flag, response
+
+
 def sendItemReview(request, **kwargs):
 	flag, response = True, None
 
@@ -266,7 +263,7 @@ def sendItemReview(request, **kwargs):
 	return flag, response
 
 
-def deleteItemReview(request, **kwargs):
+def deleteMyItemReview(request, **kwargs):
 	flag, response = True, None
 
 	# Checking that review exists

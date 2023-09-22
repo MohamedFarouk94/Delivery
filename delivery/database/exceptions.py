@@ -6,3 +6,8 @@ class BasketException(Exception):
 class OrderException(Exception):
 	def __init__(self, message):
 		super().__init__(message)
+
+
+class ReviewException(Exception):
+	def __init__(self, message):
+		super().__init__(message)

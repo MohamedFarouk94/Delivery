@@ -42,8 +42,8 @@ def getItem(request, **kwargs):
 
 
 @api_view(['GET'])
-def getReviewsOfItem(request, **kwargs):
-	return check_auth_exec('getReviewsOfItem', request, **kwargs)
+def getAllItemReviews(request, **kwargs):
+	return check_auth_exec('getAllItemReviews', request, **kwargs)
 
 
 @api_view((['GET']))
@@ -67,13 +67,8 @@ def getSellerItems(request, **kwargs):
 
 
 @api_view((['GET']))
-def getItemReviews(request, **kwargs):
-	return check_auth_exec('getItemReviews', request, **kwargs)
-
-
-@api_view((['GET']))
-def getItemReview(request, **kwargs):
-	return check_auth_exec('getItemReview', request, **kwargs)
+def getReviewsOfAnItem(request, **kwargs):
+	return check_auth_exec('getReviewsOfAnItem', request, **kwargs)
 
 
 # Seller Requests
@@ -150,6 +145,13 @@ def cancelOrder(request, **kwargs):
 	return check_auth_exec('cancelOrder', request, **kwargs)
 
 
+@api_view(['GET'])
+@authentication_classes([TokenAuthentication])
+@permission_classes([IsAuthenticated])
+def getMyItemReview(request, **kwargs):
+	return check_auth_exec('getMyItemReview', request, **kwargs)
+
+
 @api_view(['POST'])
 @authentication_classes([TokenAuthentication])
 @permission_classes([IsAuthenticated])
@@ -160,8 +162,8 @@ def sendItemReview(request, **kwargs):
 @api_view(['POST'])
 @authentication_classes([TokenAuthentication])
 @permission_classes([IsAuthenticated])
-def deleteItemReview(request, **kwargs):
-	return check_auth_exec('deleteItemReview', request, **kwargs)
+def deleteMyItemReview(request, **kwargs):
+	return check_auth_exec('deleteMyItemReview', request, **kwargs)
 
 
 # Customer & Pilot Requests

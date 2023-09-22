@@ -1,10 +1,8 @@
 package com.example.delivery
 
 import android.app.Activity
-import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Column
@@ -16,62 +14,71 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.tooling.preview.Preview
-import com.example.delivery.ui.theme.DeliveryTheme
 import io.ktor.client.call.body
 import kotlinx.coroutines.launch
 import java.net.ConnectException
 
-class ShopSellersActivity : ComponentActivity(){
-    override fun onCreate(savedInstanceState: Bundle?) {
+class ShopItemsActivity : ComponentActivity(){
+    override fun onCreate(savedInstanceState: Bundle?){
         val token = intent.getStringExtra("Token")
+        val sellerName = intent.getStringExtra("SellerName")
+        val sellerId = intent.getIntExtra("SellerId", 0)
         super.onCreate(savedInstanceState)
-        setContent {
+        setContent{
             val coroutineScope = rememberCoroutineScope()
-            var sellers by remember { mutableStateOf(mutableListOf<Seller>()) }
+            var items by remember { mutableStateOf(mutableListOf<Item>()) }
 
-            LaunchedEffect(Unit){ coroutineScope.launch { coroutineScope.launch { sellers = getSellers(token!!) } }}
-            DrawShopSellersLayout(token!!, sellers)
+            LaunchedEffect(Unit){ coroutineScope.launch { coroutineScope.launch { items = getSellerItems(token!!, sellerId) } }}
+            DrawShopItemsLayout(token = token!!, sellerName = sellerName!!, items = items)
+
         }
     }
 }
 
 @kotlinx.serialization.Serializable
-class Seller : Person(){
-    val image: String = ""
-}
+class Item(val id: Int = 0,
+           val name: String = "",
+           val sellerId: Int = 0,
+           val sellerUsername: String = "",
+           val description: String = "",
+           val price: Double = 0.0,
+           val image: String = "",
+           val rating: Double? = null,
+           val numberOfRaters: Int = 0,
+           val numberOfOrders: Int = 0,
+           val numberOfBuyouts: Int = 0)
 
-suspend fun getSellers(token: String): MutableList<Seller>{
-    val url = "http://192.168.1.9:8000/sellers"
-    val sellers: MutableList<Seller> = try{
+
+suspend fun getSellerItems(token: String, sellerId: Int): MutableList<Item>{
+    val url = "http://192.168.1.9:8000/sellers/$sellerId/items"
+    val items: MutableList<Item> = try {
         val response = sendHttpResponse(url = url, token = token, body = HashMap<String, String>())
         if (response.status.value in 200..299) response.body() else mutableListOf()
     } catch (exception: ConnectException){
         mutableListOf()
     }
-    return sellers
+    return items
 }
 
 @Composable
-fun DrawShopSellersLayout(token: String, sellers: MutableList<Seller>){
+fun DrawShopItemsLayout(token: String, sellerName: String, items: MutableList<Item>){
     val context = LocalContext.current
     Scaffold(
         topBar = {
             Column() {
                 AppBar(
-                    title = "Shop",
+                    title = sellerName,
                     icon = Icons.Default.ArrowBack,
                     onIconClick = { (context as Activity).finish() },
                     contentDescription = "Back"
                 )
-                DrawShopSellersBackLayout(token = token, sellers = sellers)
+                DrawShopItemsBackLayout(token, items)
             }
         }
     ) {
@@ -80,26 +87,13 @@ fun DrawShopSellersLayout(token: String, sellers: MutableList<Seller>){
 }
 
 @Composable
-fun DrawShopSellersBackLayout(token: String, sellers: MutableList<Seller>){
+fun DrawShopItemsBackLayout(token: String, items: MutableList<Item>){
     val context = LocalContext.current
     Column() {
         LazyColumn(Modifier, userScrollEnabled = true){
-            items(sellers){
-                    seller -> SellerRow(base64String = seller.image, name = seller.firstName){
-                        context.startActivity(Intent(context, ShopItemsActivity::class.java)
-                            .also { it.putExtra("Token", token)
-                                    it.putExtra("SellerName", seller.firstName)
-                                    it.putExtra("SellerId", seller.id)})
-            }
+            items(items){
+                    item -> ItemRow(item){}
             }
         }
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun ShowShopSellersPreview() {
-    DeliveryTheme {
-        //DrawShopSellersLayout()
     }
 }

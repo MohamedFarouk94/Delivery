@@ -16,6 +16,13 @@ def create_person(User, Token, Person, **kwargs):
 	return Person.objects.create(user=user)
 
 
+def create_seller(User, Token, Seller, name, username):
+	user = User.objects.create_user(first_name=name, last_name="Fastfood", username=username, email=f'{username}@example.com', password="test123456")
+	seller = Seller.objects.create(user=user)
+	Token.objects.create(user=user)
+	return seller
+
+
 def create_item(Item, **kwargs):
 	Item.objects.create(**kwargs)
 

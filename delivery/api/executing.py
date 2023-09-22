@@ -1,8 +1,8 @@
 from database.models import Person, Item, Seller, Customer, Pilot, Order, Review
 from rest_framework.response import Response
-from django.http import HttpResponseBadRequest
+from django.http import HttpResponseBadRequest, HttpResponseNotFound
 from django.core.exceptions import ValidationError
-from database.exceptions import BasketException, OrderException
+from database.exceptions import BasketException, OrderException, ReviewException
 
 
 # utils
@@ -59,10 +59,9 @@ def getItem(request, **kwargs):
 		return False, HttpResponseBadRequest('{"details": "Something wrong happened"}')
 
 
-def getReviewsOfItem(request, **kwargs):
-	item = Item.objects.get(id=kwargs['id'])
+def getAllItemReviews(request, **kwargs):
+	reviews = [review for review in Review.objects.all() if review.reviewed_type.model == 'item']
 	try:
-		reviews = item.get_reviews()
 		return True, Response(list_to_dict(reviews))
 	except Exception as e:
 		print('#UNKNOWN ERROR#', str(e))
@@ -107,19 +106,11 @@ def getSellerItems(request, **kwargs):
 		return False, HttpResponseBadRequest('{"details": "Something wrong happened"}')
 
 
-def getItemReviews(request, **kwargs):
-	reviews = [review for review in Review.objects.all() if isinstance(review.reviewed, Item)]
+def getReviewsOfAnItem(request, **kwargs):
+	item = Item.objects.get(id=kwargs['id'])
 	try:
+		reviews = item.get_reviews()
 		return True, Response(list_to_dict(reviews))
-	except Exception as e:
-		print('#UNKNOWN ERROR#', str(e))
-		return False, HttpResponseBadRequest('{"details": "Something wrong happened"}')
-
-
-def getItemReview(request, **kwargs):
-	review = Review.objects.get(id=kwargs['id'])
-	try:
-		return True, Response(review.to_dict())
 	except Exception as e:
 		print('#UNKNOWN ERROR#', str(e))
 		return False, HttpResponseBadRequest('{"details": "Something wrong happened"}')
@@ -267,6 +258,19 @@ def cancelOrder(request, **kwargs):
 		return False, HttpResponseBadRequest('{"details": "Something wrong happened"}')
 
 
+def getMyItemReview(request, **kwargs):
+	item = Item.objects.get(id=kwargs['id'])
+	customer = Customer.objects.get(user=request.user)
+	try:
+		review = customer.get_item_review(item)
+		return True, Response(review.to_dict())
+	except ReviewException:
+		return False, HttpResponseNotFound('{"details": "No review found for this item"}')
+	except Exception as e:
+		print('#UNKNOWN ERROR#', str(e))
+		return False, HttpResponseBadRequest('{"details": "Something wrong happened"}')
+
+
 def sendItemReview(request, **kwargs):
 	item = Item.objects.get(id=kwargs['id'])
 	customer = Customer.objects.get(user=request.user)
@@ -275,6 +279,8 @@ def sendItemReview(request, **kwargs):
 	try:
 		review = customer.send_item_review(item, rating, text)
 		return True, Response(review.to_dict())
+	except ReviewException:
+		return False, HttpResponseNotFound('{"details": "A review for this item already exists"}')
 	except ValueError:
 		return False, HttpResponseBadRequest('{"details": "Found value error in some attribute"}')
 	except ValidationError:
@@ -284,12 +290,14 @@ def sendItemReview(request, **kwargs):
 		return False, HttpResponseBadRequest('{"details": "Something wrong happened"}')
 
 
-def deleteItemReview(request, **kwargs):
-	review = Review.objects.get(id=kwargs['id'])
+def deleteMyItemReview(request, **kwargs):
+	item = Item.objects.get(id=kwargs['id'])
 	customer = Customer.objects.get(user=request.user)
 	try:
-		review = customer.delete_item_review(review)
+		review = customer.delete_item_review(item)
 		return True, Response(review.to_dict())
+	except ReviewException:
+		return False, HttpResponseNotFound('{"details": "No review found for this item"}')
 	except Exception as e:
 		print('#UNKNOWN ERROR#', str(e))
 		return False, HttpResponseBadRequest('{"details": "Something wrong happened"}')

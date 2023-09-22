@@ -12,12 +12,11 @@ urlpatterns = [
 	path('items', views.getItems, name='getItems'),
 	path('items/<int:id>', views.getItem, name='getItem'),
 	path('items/<int:id>/image', views.getImage, name='getImage'),
-	path('items/<int:id>/reviews', views.getReviewsOfItem, name='getReviewsOfItem'),
+	path('items/<int:id>/reviews', views.getReviewsOfAnItem, name='getReviewsOfAnItem'),
 	path('sellers', views.getSellers, name='getSellers'),
 	path('sellers/<int:id>', views.getSeller, name='getSeller'),
 	path('sellers/<int:id>/items', views.getSellerItems, name='getSellerItems'),
-	path('item-reviews', views.getItemReviews, name='getItemReviews'),
-	path('item-reviews/<int:id>', views.getItemReview, name='getItemReview'),
+	path('item-reviews', views.getAllItemReviews, name='getAllItemReviews'),
 
 	path('items/<int:id>/edit', views.editItem, name='editItem'),
 	path('items/add', views.addItem, name='addItem'),
@@ -30,10 +29,9 @@ urlpatterns = [
 	path('items/<int:id>/edit-quantity', views.editQuantity, name='editQuantity'),
 	path('make-order', views.makeOrder, name='makeOrder'),
 	path('orders/<int:id>/cancel', views.cancelOrder, name='cancelOrder'),
+	path('items/<int:id>/my-review', views.getMyItemReview, name='getMyItemReview'),
 	path('items/<int:id>/send-review', views.sendItemReview, name='sendItemReview'),
-	path('item-reviews/<int:id>/delete', views.deleteItemReview, name='deleteItemReview'),
-
-
+	path('items/<int:id>/delete-review', views.deleteMyItemReview, name='deleteMyItemReview'),
 
 	path('orders', views.getOrders, name='getOrders'),
 	path('orders/<int:id>', views.getOrder, name='getOrder'),
