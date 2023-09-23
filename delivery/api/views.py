@@ -159,7 +159,7 @@ def sendItemReview(request, **kwargs):
 	return check_auth_exec('sendItemReview', request, **kwargs)
 
 
-@api_view(['POST'])
+@api_view(['DELETE'])
 @authentication_classes([TokenAuthentication])
 @permission_classes([IsAuthenticated])
 def deleteMyItemReview(request, **kwargs):

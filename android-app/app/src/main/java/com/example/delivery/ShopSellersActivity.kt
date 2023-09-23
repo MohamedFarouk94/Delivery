@@ -43,22 +43,6 @@ class ShopSellersActivity : ComponentActivity(){
     }
 }
 
-@kotlinx.serialization.Serializable
-class Seller : Person(){
-    val image: String = ""
-}
-
-suspend fun getSellers(token: String): MutableList<Seller>{
-    val url = "http://192.168.1.9:8000/sellers"
-    val sellers: MutableList<Seller> = try{
-        val response = sendHttpResponse(url = url, token = token, body = HashMap<String, String>())
-        if (response.status.value in 200..299) response.body() else mutableListOf()
-    } catch (exception: ConnectException){
-        mutableListOf()
-    }
-    return sellers
-}
-
 @Composable
 fun DrawShopSellersLayout(token: String, sellers: MutableList<Seller>){
     val context = LocalContext.current

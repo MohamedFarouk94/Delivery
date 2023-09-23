@@ -266,9 +266,9 @@ def sendItemReview(request, **kwargs):
 def deleteMyItemReview(request, **kwargs):
 	flag, response = True, None
 
-	# Checking that review exists
+	# Checking that item exists
 	if flag:
-		flag, response = assert_object_exists(Review, **kwargs)
+		flag, response = assert_object_exists(Item, **kwargs)
 
 	return flag, response
 

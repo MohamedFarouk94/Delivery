@@ -64,31 +64,6 @@ class HomeActivity : ComponentActivity() {
         }
     }
 
-@kotlinx.serialization.Serializable
-open class Person(
-        val message: String = "ok",
-         val id: Int = 0,
-         val category: String = "",
-         val firstName: String = "",
-         val lastName: String = "",
-         val username: String = "",
-         val status: String = "",
-         val email: String = "",
-         val dateJoined: String = ""
-)
-
-
-suspend fun whoAmI(token: String): Person{
-    val url = "http://192.168.1.9:8000/who-am-i"
-    val person: Person = try{
-        val response = sendHttpResponse(url = url, token = token, body = HashMap<String, String>())
-        if (response.status.value in 200..299) response.body() else Person(message = "Unauthorized.")
-    } catch (exception: ConnectException){
-        Person(message = "Connection Error.")
-    }
-    return person
-}
-
 fun createMenuLists(context: Context, coroutineScope: CoroutineScope, drawerState: DrawerState, token: String, category: String): List<MenuItem>{
     if(category == "Customer")
         return listOf(

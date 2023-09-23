@@ -34,36 +34,10 @@ class ShopItemsActivity : ComponentActivity(){
             val coroutineScope = rememberCoroutineScope()
             var items by remember { mutableStateOf(mutableListOf<Item>()) }
 
-            LaunchedEffect(Unit){ coroutineScope.launch { coroutineScope.launch { items = getSellerItems(token!!, sellerId) } }}
+            LaunchedEffect(Unit) { coroutineScope.launch { items = getSellerItems(token!!, sellerId) } }
             DrawShopItemsLayout(token = token!!, sellerName = sellerName!!, items = items)
-
         }
     }
-}
-
-@kotlinx.serialization.Serializable
-class Item(val id: Int = 0,
-           val name: String = "",
-           val sellerId: Int = 0,
-           val sellerUsername: String = "",
-           val description: String = "",
-           val price: Double = 0.0,
-           val image: String = "",
-           val rating: Double? = null,
-           val numberOfRaters: Int = 0,
-           val numberOfOrders: Int = 0,
-           val numberOfBuyouts: Int = 0)
-
-
-suspend fun getSellerItems(token: String, sellerId: Int): MutableList<Item>{
-    val url = "http://192.168.1.9:8000/sellers/$sellerId/items"
-    val items: MutableList<Item> = try {
-        val response = sendHttpResponse(url = url, token = token, body = HashMap<String, String>())
-        if (response.status.value in 200..299) response.body() else mutableListOf()
-    } catch (exception: ConnectException){
-        mutableListOf()
-    }
-    return items
 }
 
 @Composable
@@ -92,7 +66,10 @@ fun DrawShopItemsBackLayout(token: String, items: MutableList<Item>){
     Column() {
         LazyColumn(Modifier, userScrollEnabled = true){
             items(items){
-                    item -> ItemRow(item){}
+                    item -> ItemRow(item){context.startActivity(Intent(context, ItemActivity::class.java).also {
+                        it.putExtra("Token", token)
+                        it.putExtra("ItemId", item.id)
+            })}
             }
         }
     }

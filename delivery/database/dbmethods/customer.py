@@ -57,7 +57,7 @@ def raise_error_if_item_reviewed(self, item):
 def get_item_review(self, item):
 	reviews = item.get_reviews()
 	try:
-		[review for review in reviews if review.reviewer == self][0]
+		return [review for review in reviews if review.reviewer == self][0]
 	except IndexError:
 		raise ReviewException('This item is not reviewed by this customer.')
 

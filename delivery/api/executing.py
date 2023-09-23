@@ -280,7 +280,7 @@ def sendItemReview(request, **kwargs):
 		review = customer.send_item_review(item, rating, text)
 		return True, Response(review.to_dict())
 	except ReviewException:
-		return False, HttpResponseNotFound('{"details": "A review for this item already exists"}')
+		return False, HttpResponseBadRequest('{"details": "A review for this item already exists"}')
 	except ValueError:
 		return False, HttpResponseBadRequest('{"details": "Found value error in some attribute"}')
 	except ValidationError:

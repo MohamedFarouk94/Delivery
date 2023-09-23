@@ -32,24 +32,6 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-@kotlinx.serialization.Serializable
-class LoginObject(val token: String = "", val message: String = "ok")
-
-suspend fun login(category: String, username: String, password: String): LoginObject {
-    val url = "http://192.168.1.9:8000/login"
-    val map = HashMap<String, String>()
-    map["category"] = category
-    map["username"] = username
-    map["password"] = password
-    val loginObject: LoginObject = try {
-        val response = sendHttpResponse(url = url, token = "", body = map)
-        if (response.status.value in 200..299) response.body() else LoginObject(message = "Username or password not correct.")
-    } catch (exception: ConnectException){
-        LoginObject(message = "Connection Error.")
-    }
-    return loginObject
-}
-
 @Composable
 fun DrawLoginLayout() {
     val usernameState = remember { mutableStateOf("") }

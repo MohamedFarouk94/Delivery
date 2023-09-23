@@ -248,12 +248,11 @@ def sendItemReview(request, **kwargs):
 
 
 def deleteMyItemReview(request, **kwargs):
-	review = Review.objects.get(id=kwargs['id'])
 	flag, response = True, None
 
-	# Checking sender is the review reviewer
+	# Checking sender is a customer
 	if flag:
-		flag, response = assert_sender_specific(request, review, 'reviewer')
+		flag, response = assert_sender_is(request, 'Customer')
 
 	return flag, response
 

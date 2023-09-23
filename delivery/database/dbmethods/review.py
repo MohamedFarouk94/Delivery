@@ -12,11 +12,12 @@ def delete(self, *args, **kwargs):
 def to_dict(self):
 	return {
 		'id': self.id,
-		'dateCreated': self.date_created,
+		'dateCreated': self.date_created.strftime("%d/%m/%Y %H:%M"),
 		'reviewerType': self.reviewer.__class__.__name__,
 		'reviewedType': self.reviewed.__class__.__name__,
 		'reviewerId': self.reviewer.user.id,
 		'reviewedId': self.reviewed.pk,
+		'reviewerUsername': self.reviewer.user.username,
 		'rating': self.rating,
 		'text': self.text
 	}
