@@ -74,6 +74,11 @@ def delete_item_review(self, item):
 	return review
 
 
+def edit_item_review(self, item, rating, text):
+	self.delete_item_review(item)
+	return self.send_item_review(item, rating, text)
+
+
 def send_order_review(self, order, rating, text):
 	order.raise_error_if_not_completed()
 	order.raise_error_if_reviewed_by_customer()

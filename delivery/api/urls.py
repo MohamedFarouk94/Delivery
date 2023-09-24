@@ -32,6 +32,7 @@ urlpatterns = [
 	path('items/<int:id>/my-review', views.getMyItemReview, name='getMyItemReview'),
 	path('items/<int:id>/send-review', views.sendItemReview, name='sendItemReview'),
 	path('items/<int:id>/delete-review', views.deleteMyItemReview, name='deleteMyItemReview'),
+	path('items/<int:id>/edit-review', views.deleteMyItemReview, name='editMyItemReview'),
 
 	path('orders', views.getOrders, name='getOrders'),
 	path('orders/<int:id>', views.getOrder, name='getOrder'),

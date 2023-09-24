@@ -166,6 +166,13 @@ def deleteMyItemReview(request, **kwargs):
 	return check_auth_exec('deleteMyItemReview', request, **kwargs)
 
 
+@api_view(['PUT'])
+@authentication_classes([TokenAuthentication])
+@permission_classes([IsAuthenticated])
+def editMyItemReview(request, **kwargs):
+	return check_auth_exec('editMyItemReview', request, **kwargs)
+
+
 # Customer & Pilot Requests
 
 @api_view(['GET'])

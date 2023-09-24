@@ -109,3 +109,42 @@ suspend fun getItemReviews(token: String, itemId: Int): MutableList<Review>{
     }
     return reviews
 }
+
+suspend fun sendItemReview(token: String, itemId: Int, rating: Int, text: String): Review{
+    val url = "http://192.168.1.9:8000/items/$itemId/send-review"
+    val map = HashMap<String, Any>()
+    map["text"] = text
+    map["rating"] = rating
+    val review: Review = try {
+        val response = sendHttpResponse(httpMethod = HttpMethod.Post, url = url, token = token, body = map)
+        if (response.status.value in 200..299) response.body() else Review()
+    } catch (exception: ConnectException) {
+        Review()
+    }
+    return review
+}
+
+suspend fun editItemReview(token: String, itemId: Int, rating: Int, text: String): Review{
+    val url = "http://192.168.1.9:8000/items/$itemId/edit-review"
+    val map = HashMap<String, Any>()
+    map["text"] = text
+    map["rating"] = rating
+    val review: Review = try {
+        val response = sendHttpResponse(httpMethod = HttpMethod.Put, url = url, token = token, body = map)
+        if (response.status.value in 200..299) response.body() else Review()
+    } catch (exception: ConnectException) {
+        Review()
+    }
+    return review
+}
+
+suspend fun deleteItemReview(token: String, itemId: Int): Review{
+    val url = "http://192.168.1.9:8000/items/$itemId/delete-review"
+    val review: Review = try {
+        val response = sendHttpResponse(httpMethod = HttpMethod.Delete, url = url, token = token, body = HashMap<String, String>())
+        if (response.status.value in 200..299) response.body() else Review()
+    } catch (exception: ConnectException) {
+        Review()
+    }
+    return review
+}

@@ -38,7 +38,7 @@ class Customer(Person):
 	from .dbmethods.customer import get_orders, get_pending_order, create_pending_order
 	from .dbmethods.customer import get_basket, get_basket_item, edit_quantity_of_item, add_to_basket, remove_from_basket
 	from .dbmethods.customer import make_order, send_item_review, send_order_review
-	from .dbmethods.customer import raise_error_if_item_reviewed, delete_item_review, get_item_review
+	from .dbmethods.customer import raise_error_if_item_reviewed, delete_item_review, get_item_review, edit_item_review
 
 
 class Pilot(Person):

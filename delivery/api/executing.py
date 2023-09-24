@@ -303,6 +303,25 @@ def deleteMyItemReview(request, **kwargs):
 		return False, HttpResponseBadRequest('{"details": "Something wrong happened"}')
 
 
+def editMyItemReview(request, **kwargs):
+	item = Item.objects.get(id=kwargs['id'])
+	customer = Customer.objects.get(user=request.user)
+	rating = request.data['rating']
+	text = request.data['text']
+	try:
+		review = customer.end_item_review(item, rating, text)
+		return True, Response(review.to_dict())
+	except ReviewException:
+		return False, HttpResponseBadRequest('{"details": "No review found for this item"}')
+	except ValueError:
+		return False, HttpResponseBadRequest('{"details": "Found value error in some attribute"}')
+	except ValidationError:
+		return False, HttpResponseBadRequest('{"details": "Found invalid value for some attribute"}')
+	except Exception as e:
+		print('#UNKNOWN ERROR#', str(e))
+		return False, HttpResponseBadRequest('{"details": "Something wrong happened"}')
+
+
 # Customer & Pilot Requests
 
 def getOrders(request, **kwargs):

@@ -273,6 +273,20 @@ def deleteMyItemReview(request, **kwargs):
 	return flag, response
 
 
+def editMyItemReview(request, **kwargs):
+	flag, response = True, None
+
+	# Checking that item exists
+	if flag:
+		flag, response = assert_object_exists(Item, **kwargs)
+
+	# Checking data contains rating & text
+	if flag:
+		flag, response = assert_attributes_contain(['rating', 'text'], request.data)
+
+	return flag, response
+
+
 # Customer & Pilot Requests
 
 def getOrders(request, **kwargs):

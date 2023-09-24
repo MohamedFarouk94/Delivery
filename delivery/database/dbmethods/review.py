@@ -11,7 +11,7 @@ def delete(self, *args, **kwargs):
 
 def to_dict(self):
 	return {
-		'id': self.id,
+		'id': self.id if self.id else 0,
 		'dateCreated': self.date_created.strftime("%d/%m/%Y %H:%M"),
 		'reviewerType': self.reviewer.__class__.__name__,
 		'reviewedType': self.reviewed.__class__.__name__,

@@ -27,6 +27,7 @@
         <activity android:name=".ShopSellersActivity"> </activity>
         <activity android:name=".ShopItemsActivity"> </activity>
         <activity android:name=".ItemActivity"> </activity>
+        <activity android:name=".ReviewActivity"> </activity>
     </application>
 
 </manifest>

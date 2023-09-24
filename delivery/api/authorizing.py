@@ -257,6 +257,16 @@ def deleteMyItemReview(request, **kwargs):
 	return flag, response
 
 
+def editMyItemReview(request, **kwargs):
+	flag, response = True, None
+
+	# Checking sender is a customer
+	if flag:
+		flag, response = assert_sender_is(request, 'Customer')
+
+	return flag, response
+
+
 # Customer & Pilot Requests
 
 def getOrders(request, **kwargs):

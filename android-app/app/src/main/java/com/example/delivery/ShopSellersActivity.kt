@@ -1,13 +1,14 @@
 package com.example.delivery
 
+import android.annotation.SuppressLint
 import android.app.Activity
-import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
@@ -16,7 +17,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -25,11 +25,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.delivery.ui.theme.DeliveryTheme
-import io.ktor.client.call.body
 import kotlinx.coroutines.launch
-import java.net.ConnectException
 
 class ShopSellersActivity : ComponentActivity(){
+    @SuppressLint("MutableCollectionMutableState")
     override fun onCreate(savedInstanceState: Bundle?) {
         val token = intent.getStringExtra("Token")
         super.onCreate(savedInstanceState)
@@ -48,25 +47,24 @@ fun DrawShopSellersLayout(token: String, sellers: MutableList<Seller>){
     val context = LocalContext.current
     Scaffold(
         topBar = {
-            Column() {
+            Column{
                 AppBar(
                     title = "Shop",
                     icon = Icons.Default.ArrowBack,
                     onIconClick = { (context as Activity).finish() },
                     contentDescription = "Back"
                 )
-                DrawShopSellersBackLayout(token = token, sellers = sellers)
             }
         }
     ) {
-        it.calculateBottomPadding()
+        padding -> DrawShopSellersBackLayout(padding = padding, token = token, sellers = sellers)
     }
 }
 
 @Composable
-fun DrawShopSellersBackLayout(token: String, sellers: MutableList<Seller>){
+fun DrawShopSellersBackLayout(padding: PaddingValues, token: String, sellers: MutableList<Seller>){
     val context = LocalContext.current
-    Column() {
+    Column(modifier = Modifier.padding(padding)) {
         LazyColumn(Modifier, userScrollEnabled = true){
             items(sellers){
                     seller -> SellerRow(base64String = seller.image, name = seller.firstName){
