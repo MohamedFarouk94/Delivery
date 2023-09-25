@@ -6,6 +6,7 @@ bk = 'Blocked'
 pn = 'Pending'
 od = 'Ordered'
 ow = 'On-Way'
+av = 'Arrived'
 cm = 'Completed'
 cd = 'Canceled'
 pb = 'Problem'
@@ -20,7 +21,7 @@ tbd = 'TBD'
 PERSON_STATUS_CHOICES = [(ac, ac), (bk, bk)]
 
 # order status choices
-ORDER_STATUS_CHOICES = [(pn, pn), (od, od), (ow, ow), (cm, cm), (cd, cd), (pb, pb)]
+ORDER_STATUS_CHOICES = [(pn, pn), (od, od), (ow, ow), (av, av), (cm, cm), (cd, cd), (pb, pb)]
 
 # person category choices
 PERSON_CATEGORY_CHOICES = [(se, se), (cu, cu), (pi, pi), (tbd, tbd)]

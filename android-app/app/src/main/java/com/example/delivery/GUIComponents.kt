@@ -77,7 +77,7 @@ fun TwoCasesButton(caseState: Boolean = false,
                    falseCaseText: String, falseCaseBackgroundColor: Color, falseCaseTextColor: Color, falseCaseClick: ()->Unit,
                    trueCaseText: String, trueCaseBackgroundColor: Color, trueCaseTextColor: Color, trueCaseClick: ()->Unit){
 
-    Log.d("item", caseState.toString() + " gui")
+    Log.d("item", enabledState.value.toString())
     val onClick = if(caseState) trueCaseClick else falseCaseClick
     val backgroundColor = if(!enabledState.value) disabledBackgroundColor else if(caseState) trueCaseBackgroundColor else falseCaseBackgroundColor
     val textColor = if(!enabledState.value) disabledTextColor else if(caseState) trueCaseTextColor else falseCaseTextColor

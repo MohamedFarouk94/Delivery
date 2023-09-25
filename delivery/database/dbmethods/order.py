@@ -1,36 +1,44 @@
-from database.strings import pn, od, cm, ow, cd, pb
+from database.strings import pn, od, cm, ow, av, cd, pb
 from django.utils import timezone as dt
 from database.exceptions import BasketException, OrderException
 
 
+def raise_error_if(self, status):
+	if self.status == status:
+		raise OrderException(f'This order is already {status}.')
+
+
+def raise_error_if_not(self, status):
+	if self.status != status:
+		raise OrderException(f'This order is not {status}.')
+
+
 def raise_error_if_not_pending(self):
-	if self.status != pn:
-		raise OrderException('This order is already ordered.')
+	self.raise_error_if_not(pn)
 
 
 def raise_error_if_not_completed(self):
-	if self.status != cm:
-		raise OrderException('This order is not completed.')
+	self.raise_error_if_not(cm)
 
 
 def raise_error_if_on_way(self):
-	if self.status == ow:
-		raise OrderException('This order is on way.')
+	self.raise_error_if(ow)
+
+
+def raise_error_if_arrived(self):
+	self.raise_error_if(av)
 
 
 def raise_error_if_completed(self):
-	if self.status == cm:
-		raise OrderException('This order is already completed.')
+	self.raise_error_if(cm)
 
 
 def raise_error_if_canceled(self):
-	if self.status == cd:
-		raise OrderException('This order is canceled.')
+	self.raise_error_if(cd)
 
 
 def raise_error_if_problem(self):
-	if self.status == pb:
-		raise OrderException('This order is in problem status and is being reviewed.')
+	self.raise_error_if(pb)
 
 
 def raise_error_if_basket_empty(self):
@@ -131,6 +139,7 @@ def make_order(self, region):
 
 def cancel_order(self):
 	self.raise_error_if_on_way()
+	self.raise_error_if_arrived()
 	self.raise_error_if_completed()
 	self.raise_error_if_problem()
 	self.raise_error_if_canceled()
@@ -144,6 +153,7 @@ def cancel_order(self):
 
 def assign_pilot(self, pilot):
 	self.raise_error_if_on_way()
+	self.raise_error_if_arrived()
 	self.raise_error_if_completed()
 	self.raise_error_if_canceled()
 	self.raise_error_if_problem()
@@ -157,6 +167,7 @@ def assign_pilot(self, pilot):
 
 
 def remove_pilot(self):
+	self.raise_error_if_arrived()
 	self.raise_error_if_completed()
 	self.raise_error_if_canceled()
 	self.raise_error_if_problem()

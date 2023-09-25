@@ -1,0 +1,4 @@
+**/__pycache__/
+**/migrations/
+**/android-app/libraries/
+**/db.sqlite3
