@@ -6,10 +6,12 @@
 *Delivery* is an E-Commerce system, or it can be seen as a *Talabat* clone. It can provide an opportunity for sellers, delivery persons (They are called 'pilots' in the terminology of this project) and customers to play their roles in an E-Commerce process.
 Delivery consists of a Backend API, an Adnroid application for customers and pilots, and a desktop application for sellers and staff members.
 
+## Installation Guide
+*Coming Soon*
+
 ## Features
 ### 1. Backend API
 * All users (sellers, customers, pilots or staff members) can use API to implement their meant actions as seen below in API endpoints.
-
 ### 2. Android app
 * Customers and pilots can use Delivery Android app as a third party app to implement the customer/pilot related actions.
 * *Delivery* Android app provides a shortlist feature for customers to store their marked items on their local machines.
@@ -35,6 +37,7 @@ Delivery consists of a Backend API, an Adnroid application for customers and pil
 | PATCH | /items/:ItemId/set-image | Attatching an image to an item | Yes | Seller | b64img |
 | GET | /basket | Getting customer's basket | Yes | Customer | |
 | POST | /items/:ItemId/add-to-basket | Adding an item to customer's basket | Yes | Customer | quantity |
+| POST | /items/:ItemId/edit-quantity | Changing an item quantity in customer's basket | Yes | Customer | quantity |
 | DELETE | /items/:ItemId/remove-from-basket | Removing an item from customer's basket | Yes | Customer | |
 | POST | /make-order | Making an order with all items in customer's basket | Yes | Customer | region |
 | DELETE | /orders/:OrderId/cancel | Canceling an order | Yes | Customer | |
