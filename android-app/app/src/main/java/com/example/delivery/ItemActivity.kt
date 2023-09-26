@@ -6,7 +6,6 @@ import android.content.Intent
 import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.util.Base64
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
@@ -55,11 +54,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.delivery.ui.theme.DeliveryTheme
 import com.example.delivery.ui.theme.Wood
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import java.lang.Thread.sleep
 
 class ItemActivity : ComponentActivity() {
     @SuppressLint("MutableCollectionMutableState")
@@ -69,17 +65,17 @@ class ItemActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         setContent{
+            val context = LocalContext.current
             val refreshScope = rememberCoroutineScope()
             var refreshing by remember { mutableStateOf(false) }
             val loadingKey = remember { mutableStateOf(false) }
+            val openReviewActivity = remember { mutableStateOf(false) }
             val coroutineScope = rememberCoroutineScope()
             var item by remember { mutableStateOf(Item()) }
             var reviews by remember { mutableStateOf(mutableListOf<Review>()) }
             val myReviewState = remember { mutableStateOf(Review()) }
-            val isLoadedFlagState = remember { mutableStateOf(false) }
 
             fun refresh() = refreshScope.launch{
-                Log.d("refresh", "REFRESHED")
                 refreshing = true
                 delay(1000)
                 refreshing = false
@@ -94,15 +90,24 @@ class ItemActivity : ComponentActivity() {
                     myReviewState.value = getMyReview(token, itemId)
                     if(reviews.size > 0) reviews = reviews.map { review ->  review.checkIfMine(myReviewState.value.id).checkIfText()} as MutableList<Review>
                     if(reviews.size > 0) reviews = reviews.sortedWith(compareBy({-it.isMine.toInt()}, {-it.isText.toInt()}, {-it.id})) as MutableList<Review>
-                    isLoadedFlagState.value = !isLoadedFlagState.value
-                    Log.d("onClick", "#####################################################################################")
+
+                    if(openReviewActivity.value) {
+                        context.startActivity(Intent(context, ReviewActivity::class.java).also {
+                            it.putExtra("Token", token)
+                            it.putExtra("ItemId", item.id)
+                            it.putExtra("ItemName", item.name)
+                            it.putExtra("MyReviewId", myReviewState.value.id)
+                            it.putExtra("MyReviewRating", myReviewState.value.rating)
+                            it.putExtra("MyReviewText", myReviewState.value.text)
+                        })
+                        openReviewActivity.value = false
+                    }
                 }
             }
-            DrawItemLayout(isLoadedFlagState = isLoadedFlagState,
-                           refreshState = refreshState,
+            DrawItemLayout(refreshState = refreshState,
                            refreshing = refreshing,
                            loadingKey = loadingKey,
-                           token = token!!,
+                           openReviewActivity = openReviewActivity,
                            item = item,
                            myReviewState = myReviewState,
                            reviews = reviews)
@@ -111,11 +116,10 @@ class ItemActivity : ComponentActivity() {
 }
 
 @Composable
-fun DrawItemLayout(isLoadedFlagState: MutableState<Boolean>,
-                   refreshState: PullRefreshState,
+fun DrawItemLayout(refreshState: PullRefreshState,
                    refreshing: Boolean,
                    loadingKey: MutableState<Boolean>,
-                   token: String,
+                   openReviewActivity: MutableState<Boolean>,
                    item: Item,
                    myReviewState: MutableState<Review>,
                    reviews: MutableList<Review>){
@@ -132,12 +136,11 @@ fun DrawItemLayout(isLoadedFlagState: MutableState<Boolean>,
             }
         }
     ) {
-        padding -> DrawItemBackLayout(isLoadedFlagState = isLoadedFlagState,
-                                      refreshState = refreshState,
+        padding -> DrawItemBackLayout(refreshState = refreshState,
                                       refreshing = refreshing,
                                       loadingKey = loadingKey,
+                                      openReviewActivity = openReviewActivity,
                                       padding = padding,
-                                      token = token,
                                       item = item,
                                       myReviewState = myReviewState,
                                       reviews = reviews)
@@ -145,16 +148,14 @@ fun DrawItemLayout(isLoadedFlagState: MutableState<Boolean>,
 }
 
 @Composable
-fun DrawItemBackLayout(isLoadedFlagState: MutableState<Boolean>,
-                       refreshState: PullRefreshState,
+fun DrawItemBackLayout(refreshState: PullRefreshState,
                        refreshing: Boolean,
                        loadingKey: MutableState<Boolean>,
+                       openReviewActivity: MutableState<Boolean>,
                        padding: PaddingValues,
-                       token: String,
                        item: Item,
                        myReviewState: MutableState<Review>,
                        reviews: MutableList<Review>){
-    val context = LocalContext.current
 
     val b64 = item.image.replace("\\n", "\n")
     val imageBytes = Base64.decode(b64, Base64.DEFAULT)
@@ -217,16 +218,8 @@ fun DrawItemBackLayout(isLoadedFlagState: MutableState<Boolean>,
             Button(onClick = { /*TODO*/ }) { Text(text = "Add to Shortlist") }
         }
         val onClick = {
+                openReviewActivity.value = true
                 loadingKey.value = !loadingKey.value
-                Log.d("onClick", myReviewState.value.id.toString())
-                context.startActivity(Intent(context, ReviewActivity::class.java).also {
-                    it.putExtra("Token", token)
-                    it.putExtra("ItemId", item.id)
-                    it.putExtra("ItemName", item.name)
-                    it.putExtra("MyReviewId", myReviewState.value.id)
-                    it.putExtra("MyReviewRating", myReviewState.value.rating)
-                    it.putExtra("MyReviewText", myReviewState.value.text)
-            })
         }
         Row(
             modifier = Modifier.fillMaxWidth(),
