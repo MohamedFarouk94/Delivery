@@ -33,7 +33,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.LifecycleCoroutineScope
 import com.example.delivery.ui.theme.Danger
 import com.example.delivery.ui.theme.DeliveryTheme
 import com.example.delivery.ui.theme.Wood
@@ -53,7 +52,8 @@ class ReviewActivity : ComponentActivity() {
         setContent{
             val context = LocalContext.current
             val coroutineScope = rememberCoroutineScope()
-            var dismissFlag = remember { mutableStateOf(false) }
+            val dismissFlag = remember { mutableStateOf(false) }
+            val deleteFlag = remember { mutableStateOf(false) }
             DrawReviewLayout(
                 context = context,
                 coroutineScope = coroutineScope,
@@ -61,26 +61,42 @@ class ReviewActivity : ComponentActivity() {
                 itemName = itemName!!, editFlag = myReviewId > 0,
                 enteredRating = remember { mutableStateOf(myReviewRating) },
                 enteredReview = remember { mutableStateOf(myReviewText!!) },
-                dismissFlag = dismissFlag)
-            BackHandler() {
+                dismissFlag = dismissFlag,
+                deleteFlag = deleteFlag)
+            BackHandler {
                 dismissFlag.value = true
             }
             if(dismissFlag.value) ShowAlertDialog(
                 onDismissRequest = { dismissFlag.value = false},
                 onConfirmation = { (context as Activity).finish() },
-                dialogText = "Are you sure? Changes will be lost.",
-                dialogTitle = "Discard Changes"
+                dialogTitle = "Discard Changes",
+                dialogText = "Are you sure? Changes will be lost."
+            )
+            if(deleteFlag.value) ShowAlertDialog(
+                onDismissRequest = { deleteFlag.value = false },
+                onConfirmation = {
+                    coroutineScope.launch { deleteItemReview(token = token, itemId = itemId) }
+                    Toast.makeText(context, "Review deleted successfully", Toast.LENGTH_SHORT).show()
+                    (context as Activity).finish() },
+                dialogTitle = "Delete Review",
+                dialogText = "Are you sure? Deleting cannot be undone."
             )
         }
     }
 }
 
 @Composable
-fun DrawReviewLayout(context: Context, coroutineScope: CoroutineScope,
-                    token: String, itemId: Int,
-                     itemName: String, editFlag: Boolean, enteredRating: MutableState<Int>,
-                     enteredReview: MutableState<String>, dismissFlag: MutableState<Boolean>){
-    Column() {
+fun DrawReviewLayout(context: Context,
+                     coroutineScope: CoroutineScope,
+                     token: String,
+                     itemId: Int,
+                     itemName: String,
+                     editFlag: Boolean,
+                     enteredRating: MutableState<Int>,
+                     enteredReview: MutableState<String>,
+                     dismissFlag: MutableState<Boolean>,
+                     deleteFlag: MutableState<Boolean>){
+    Column {
         // Up Comment
         Box(modifier = Modifier
             .fillMaxWidth()
@@ -118,11 +134,7 @@ fun DrawReviewLayout(context: Context, coroutineScope: CoroutineScope,
                 enabledText = "Delete",
                 enabledBackgroundColor = Danger,
                 enabledTextColor = Color.White,
-                onClick = {
-                    coroutineScope.launch { deleteItemReview(token = token, itemId = itemId) }
-                    Toast.makeText(context, "Review deleted successfully", Toast.LENGTH_SHORT).show()
-                    (context as Activity).finish()
-                }
+                onClick = { deleteFlag.value = true }
             )
             if(editFlag) Spacer(Modifier.width(8.dp))
             TwoCasesButton(
