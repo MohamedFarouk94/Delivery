@@ -37,7 +37,7 @@ Delivery consists of a Backend API, an Adnroid application for customers and pil
 | PATCH | /items/:ItemId/set-image | Attatching an image to an item | Yes | Seller | b64img |
 | GET | /basket | Getting customer's basket | Yes | Customer | |
 | POST | /items/:ItemId/add-to-basket | Adding an item to customer's basket | Yes | Customer | quantity |
-| POST | /items/:ItemId/edit-quantity | Changing an item quantity in customer's basket | Yes | Customer | quantity |
+| PATCH | /items/:ItemId/edit-quantity | Changing an item quantity in customer's basket | Yes | Customer | quantity |
 | DELETE | /items/:ItemId/remove-from-basket | Removing an item from customer's basket | Yes | Customer | |
 | POST | /make-order | Making an order with all items in customer's basket | Yes | Customer | region |
 | DELETE | /orders/:OrderId/cancel | Canceling an order | Yes | Customer | |
