@@ -20,9 +20,12 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material.icons.filled.ArrowLeft
+import androidx.compose.material.icons.filled.ArrowRight
 import androidx.compose.material.icons.filled.Bookmarks
 import androidx.compose.material.icons.filled.ShoppingBasket
 import androidx.compose.material.icons.filled.Star
@@ -37,6 +40,7 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
@@ -60,9 +64,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import com.example.delivery.ui.theme.DeliveryTheme
 import com.example.delivery.ui.theme.Tortilla
 import com.example.delivery.ui.theme.Wood
+import kotlin.math.max
 
 data class MenuItem(val title: String, val icon: ImageVector, val onClick: ()->Unit)
 
@@ -252,7 +258,10 @@ fun SellerRow(base64String: String, name: String, f:()->Unit){
 }
 
 @Composable
-fun ItemRow(item: Item, f:()->Unit){
+fun ItemRow(item: Item,
+            onBasketClick: ()->Unit = {},
+            onShortlistClick: ()->Unit = {},
+            f:()->Unit){
     val b64 = item.image.replace("\\n", "\n")
     val imageBytes = Base64.decode(b64, Base64.DEFAULT)
     val decodedImage = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
@@ -276,19 +285,18 @@ fun ItemRow(item: Item, f:()->Unit){
             Text(text = item.name, style = TextStyle(fontSize = 16.sp, fontWeight = FontWeight.Bold))
             Text(text = description, style = TextStyle(fontSize = 12.sp))
             Text(text = "Price: $price")
-            // Text(text = "Rating: ${item.rating ?: "Not Available"}", style = TextStyle(fontSize = 14.sp))
             Text(text = "Rating: $rating", style = TextStyle(fontSize = 14.sp))
             Spacer(Modifier.height(24.dp))
         }
         Column(modifier = Modifier
             .weight(0.3f)
             .padding(5.dp)) {
-            Button(onClick = { }, modifier = Modifier, colors = ButtonDefaults.buttonColors(Wood)
+            Button(onClick = onBasketClick, modifier = Modifier, colors = ButtonDefaults.buttonColors(Wood)
                 ) {
                 Icon(imageVector = Icons.Default.ShoppingBasket, contentDescription = "add to basket")
             }
             Spacer(Modifier.height(8.dp))
-            Button(onClick = { }, modifier = Modifier, colors = ButtonDefaults.buttonColors(Wood)
+            Button(onClick = onShortlistClick, modifier = Modifier, colors = ButtonDefaults.buttonColors(Wood)
                 ) {
                 Icon(imageVector = Icons.Default.Bookmarks, contentDescription = "add to shortlist")
             }
@@ -332,6 +340,56 @@ fun ShowAlertDialog(
         confirmButton = { TextButton(onClick = { onConfirmation() }) { Text("Confirm") } },
         dismissButton = { TextButton(onClick = { onDismissRequest() }) { Text("Dismiss") } }
     )
+}
+
+@Composable
+fun BasketDialog(
+    itemName: String,
+    originalQuantity : Int,
+    newQuantity: MutableState<Int>,
+    unitPrice: Double,
+    edit: Boolean,
+    setShow: (Boolean) -> Unit,
+    addToBasket: () -> Unit,
+    editQuantity: () -> Unit,
+    removeFromBasket: () -> Unit
+) {
+    val title = if(edit) "Edit Basket" else "Add to Basket"
+    val body1 = if(edit) "$itemName is in your basket." else "Add $itemName to your basket."
+    val body2 = if(edit) "You can edit quantity." else "Determine quantity."
+    var editableQuantity by remember { mutableStateOf(originalQuantity) }
+    var totalPrice by remember { mutableStateOf(unitPrice * originalQuantity) }
+    val priceNote = "Please note that total price doesn't contain delivery fee."
+    val actionButtonText = if(edit) "Edit Quantity" else "Add to Basket"
+    val actionFunction = if(edit) editQuantity else addToBasket
+
+    Dialog(onDismissRequest = { setShow(false) }) {
+        Surface(shape = RoundedCornerShape(16.dp)) {
+            Box(contentAlignment = Alignment.Center) {
+                Column(modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(20.dp)) {
+                    Text(text = title, fontWeight = FontWeight.Bold)
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Text(text = body1)
+                    Text(text = body2)
+                    Row(modifier = Modifier.fillMaxWidth()){
+                        Text(text = "Quantity")
+                        Icon(imageVector = Icons.Default.ArrowLeft, contentDescription = "-",
+                            modifier = Modifier.clickable { editableQuantity = max(1, editableQuantity - 1); totalPrice = unitPrice * editableQuantity })
+                        Text(text = editableQuantity.toString())
+                        Icon(imageVector = Icons.Default.ArrowRight, contentDescription = "+",
+                            modifier = Modifier.clickable { editableQuantity++; totalPrice = unitPrice * editableQuantity })
+                    }
+                    Text(text = "Total Price: $totalPrice")
+                    Text(text = priceNote)
+                    TextButton(onClick = { newQuantity.value = editableQuantity; actionFunction(); setShow(false)}, modifier = Modifier.align(Alignment.End)) { Text(text = actionButtonText) }
+                    if(edit) { TextButton(onClick = { removeFromBasket(); setShow(false)},  modifier = Modifier.align(Alignment.End)) { Text(text = "Remove from Basket") } }
+                    TextButton(onClick = { setShow(false) },  modifier = Modifier.align(Alignment.End)) { Text(text = "Dismiss") }
+                }
+            }
+        }
+    }
 }
 
 

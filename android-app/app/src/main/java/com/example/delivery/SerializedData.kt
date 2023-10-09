@@ -60,3 +60,16 @@ class Review(
         return this
     }
 }
+
+
+@kotlinx.serialization.Serializable
+class BasketItem(
+    val id: Int = 0,
+    val customerId: Int = 0,
+    val customerUsername: String = "",
+    val orderId: Int = 0,
+    val itemId: Int = 0,
+    val itemName: String = "",
+    val quantity: Int = 0,
+    val totalPrice: Double = 0.0
+)

@@ -82,6 +82,7 @@ class Order(models.Model):
 	date_pilot_assigned = models.DateTimeField(null=True)
 	date_concluded = models.DateTimeField(null=True)
 
+	from .dbmethods.order import raise_error_if, raise_error_if_not
 	from .dbmethods.order import raise_error_if_item_exists, raise_error_if_not_pending, raise_error_if_basket_empty, raise_error_if_item_doesnt_exist
 	from .dbmethods.order import raise_error_if_completed, raise_error_if_problem, raise_error_if_on_way, raise_error_if_canceled
 	from .dbmethods.order import get_basket, get_basket_item, get_quantity_of_item, edit_quantity_of_item, add_to_basket, remove_from_basket

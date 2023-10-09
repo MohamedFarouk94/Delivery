@@ -6,6 +6,7 @@ import android.content.Intent
 import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.util.Base64
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
@@ -74,6 +75,13 @@ class ItemActivity : ComponentActivity() {
             var item by remember { mutableStateOf(Item()) }
             var reviews by remember { mutableStateOf(mutableListOf<Review>()) }
             val myReviewState = remember { mutableStateOf(Review()) }
+            val showBasketDialog = remember { mutableStateOf(false) }
+            var basket by remember { mutableStateOf(mutableListOf<BasketItem>()) }
+            var itemInBasket by remember { mutableStateOf(basket.any { basketItem ->  basketItem.itemId == itemId}) }
+            val basketActionFlag = remember { mutableStateOf(false) }
+            val basketAction = remember { mutableStateOf("") }
+            val originalQuantity = remember { mutableStateOf(1) }
+            val newQuantity = remember { mutableStateOf(1) }
 
             fun refresh() = refreshScope.launch{
                 refreshing = true
@@ -90,6 +98,9 @@ class ItemActivity : ComponentActivity() {
                     myReviewState.value = getMyReview(token, itemId)
                     if(reviews.size > 0) reviews = reviews.map { review ->  review.checkIfMine(myReviewState.value.id).checkIfText()} as MutableList<Review>
                     if(reviews.size > 0) reviews = reviews.sortedWith(compareBy({-it.isMine.toInt()}, {-it.isText.toInt()}, {-it.id})) as MutableList<Review>
+                    basket = getBasket(token)
+                    itemInBasket = basket.any { basketItem -> basketItem.itemId == itemId }
+                    originalQuantity.value = if(itemInBasket) basket.find { basketItem -> basketItem.itemId == itemId }?.quantity!! else 1
 
                     if(openReviewActivity.value) {
                         context.startActivity(Intent(context, ReviewActivity::class.java).also {
@@ -102,15 +113,39 @@ class ItemActivity : ComponentActivity() {
                         })
                         openReviewActivity.value = false
                     }
+
+                    if(basketActionFlag.value){
+                        when (basketAction.value) {
+                            "Add" -> { addToBasket(token, itemId, newQuantity.value); Toast.makeText(context,"Item is successfully added to your basket", Toast.LENGTH_SHORT).show() }
+                            "Edit" -> { editQuantity(token, itemId, newQuantity.value); Toast.makeText(context,"Item quantity is successfully changed", Toast.LENGTH_SHORT).show() }
+                            "Remove" -> { removeFromBasket(token, itemId); Toast.makeText(context,"Item is successfully removed from your basket", Toast.LENGTH_SHORT).show() }
+                        }
+                        basketActionFlag.value = false
+                        loadingKey.value = !loadingKey.value // loading again
+                    }
                 }
             }
+
+            if(showBasketDialog.value) BasketDialog(
+                itemName = item.name,
+                originalQuantity = originalQuantity.value,
+                newQuantity = newQuantity,
+                unitPrice = item.price,
+                edit = itemInBasket,
+                setShow = { showBasketDialog.value = it },
+                addToBasket = { basketAction.value = "Add"; basketActionFlag.value = true; loadingKey.value = !loadingKey.value },
+                editQuantity = { basketAction.value = "Edit"; basketActionFlag.value = true; loadingKey.value = !loadingKey.value },
+                removeFromBasket = { basketAction.value = "Remove"; basketActionFlag.value = true; loadingKey.value = !loadingKey.value })
+
             DrawItemLayout(refreshState = refreshState,
                            refreshing = refreshing,
                            loadingKey = loadingKey,
                            openReviewActivity = openReviewActivity,
                            item = item,
                            myReviewState = myReviewState,
-                           reviews = reviews)
+                           reviews = reviews,
+                           showBasketDialog = showBasketDialog,
+                           itemInBasket = itemInBasket)
         }
     }
 }
@@ -122,7 +157,9 @@ fun DrawItemLayout(refreshState: PullRefreshState,
                    openReviewActivity: MutableState<Boolean>,
                    item: Item,
                    myReviewState: MutableState<Review>,
-                   reviews: MutableList<Review>){
+                   reviews: MutableList<Review>,
+                   showBasketDialog: MutableState<Boolean>,
+                   itemInBasket: Boolean){
     val context = LocalContext.current
     Scaffold(
         topBar = {
@@ -143,7 +180,9 @@ fun DrawItemLayout(refreshState: PullRefreshState,
                                       padding = padding,
                                       item = item,
                                       myReviewState = myReviewState,
-                                      reviews = reviews)
+                                      reviews = reviews,
+                                      showBasketDialog = showBasketDialog,
+                                      itemInBasket = itemInBasket)
     }
 }
 
@@ -155,7 +194,9 @@ fun DrawItemBackLayout(refreshState: PullRefreshState,
                        padding: PaddingValues,
                        item: Item,
                        myReviewState: MutableState<Review>,
-                       reviews: MutableList<Review>){
+                       reviews: MutableList<Review>,
+                       showBasketDialog: MutableState<Boolean>,
+                       itemInBasket: Boolean){
 
     val b64 = item.image.replace("\\n", "\n")
     val imageBytes = Base64.decode(b64, Base64.DEFAULT)
@@ -213,9 +254,29 @@ fun DrawItemBackLayout(refreshState: PullRefreshState,
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Center
         ) {
-            Button(onClick = { /*TODO*/ }) { Text(text = "Add to Basket") }
+            TwoCasesButton(
+                caseState = itemInBasket,
+                falseCaseText = "Add to Basket",
+                falseCaseBackgroundColor = Wood,
+                falseCaseTextColor = Color.White,
+                falseCaseClick = { showBasketDialog.value = true },
+                trueCaseText = "Edit Basket",
+                trueCaseBackgroundColor = Wood,
+                trueCaseTextColor = Color.White,
+                trueCaseClick = { showBasketDialog.value = true }
+            )
             Spacer(modifier = Modifier.width(36.dp))
-            Button(onClick = { /*TODO*/ }) { Text(text = "Add to Shortlist") }
+            TwoCasesButton(
+                caseState = false,
+                falseCaseText = "Add to Shortlist",
+                falseCaseBackgroundColor = Wood,
+                falseCaseTextColor = Color.White,
+                falseCaseClick = {},
+                trueCaseText = "Remove from Shortlist",
+                trueCaseBackgroundColor = Wood,
+                trueCaseTextColor = Color.White,
+                trueCaseClick = {}
+            )
         }
         val onClick = {
                 openReviewActivity.value = true

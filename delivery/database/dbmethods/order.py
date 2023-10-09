@@ -110,6 +110,7 @@ def remove_from_basket(self, item):
 
 	basket_item = BasketItem.objects.get(order=self, item=item)
 	basket_item.delete()
+	basket_item.id = 0
 	return basket_item
 
 

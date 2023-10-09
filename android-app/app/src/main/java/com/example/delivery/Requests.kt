@@ -148,3 +148,51 @@ suspend fun deleteItemReview(token: String, itemId: Int): Review{
     }
     return review
 }
+
+suspend fun getBasket(token: String): MutableList<BasketItem>{
+    val url = "http://192.168.1.9:8000/basket"
+    val basket: MutableList<BasketItem> = try {
+        val response = sendHttpResponse(httpMethod = HttpMethod.Get, url = url, token = token, body = HashMap<String, String>())
+        if (response.status.value in 200..299) response.body() else mutableListOf()
+    } catch (exception: ConnectException) {
+        mutableListOf()
+    }
+    return basket
+}
+
+suspend fun addToBasket(token: String, itemId: Int, quantity: Int): BasketItem{
+    val url = "http://192.168.1.9:8000/items/$itemId/add-to-basket"
+    val map = HashMap<String, Any>()
+    map["quantity"] = quantity
+    val basketItem: BasketItem = try {
+        val response = sendHttpResponse(httpMethod = HttpMethod.Post, url = url, token = token, body = map)
+        if (response.status.value in 200..299) response.body() else BasketItem()
+    } catch (exception: ConnectException) {
+        BasketItem()
+    }
+    return basketItem
+}
+
+suspend fun editQuantity(token: String, itemId: Int, quantity: Int): BasketItem{
+    val url = "http://192.168.1.9:8000/items/$itemId/edit-quantity"
+    val map = HashMap<String, Any>()
+    map["quantity"] = quantity
+    val basketItem: BasketItem = try {
+        val response = sendHttpResponse(httpMethod = HttpMethod.Patch, url = url, token = token, body = map)
+        if (response.status.value in 200..299) response.body() else BasketItem()
+    } catch (exception: ConnectException) {
+        BasketItem()
+    }
+    return basketItem
+}
+
+suspend fun removeFromBasket(token: String, itemId: Int): BasketItem{
+    val url = "http://192.168.1.9:8000/items/$itemId/remove-from-basket"
+    val basketItem: BasketItem = try {
+        val response = sendHttpResponse(httpMethod = HttpMethod.Delete, url = url, token = token, body = HashMap<String, String>())
+        if (response.status.value in 200..299) response.body() else BasketItem()
+    } catch (exception: ConnectException) {
+        BasketItem()
+    }
+    return basketItem
+}
