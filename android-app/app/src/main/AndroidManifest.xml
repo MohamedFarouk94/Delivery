@@ -28,6 +28,7 @@
         <activity android:name=".ShopItemsActivity"> </activity>
         <activity android:name=".ItemActivity"> </activity>
         <activity android:name=".ReviewActivity"> </activity>
+        <activity android:name=".BasketActivity"> </activity>
     </application>
 
 </manifest>

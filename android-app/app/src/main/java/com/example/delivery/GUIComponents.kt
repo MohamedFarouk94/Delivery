@@ -259,6 +259,7 @@ fun SellerRow(base64String: String, name: String, f:()->Unit){
 
 @Composable
 fun ItemRow(item: Item,
+            quantity: Int = 0,
             onBasketClick: ()->Unit = {},
             onShortlistClick: ()->Unit = {},
             f:()->Unit){
@@ -286,6 +287,8 @@ fun ItemRow(item: Item,
             Text(text = description, style = TextStyle(fontSize = 12.sp))
             Text(text = "Price: $price")
             Text(text = "Rating: $rating", style = TextStyle(fontSize = 14.sp))
+            if(quantity > 0) Text(text = "Quantity: $quantity", style = TextStyle(fontSize = 14.sp, fontWeight = FontWeight.Bold))
+            if(quantity > 0) Text(text = "Total Price: ${quantity * item.price}", style = TextStyle(fontSize = 14.sp, fontWeight = FontWeight.Bold))
             Spacer(Modifier.height(24.dp))
         }
         Column(modifier = Modifier
