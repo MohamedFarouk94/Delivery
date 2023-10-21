@@ -52,6 +52,8 @@ class ShopItemsActivity : ComponentActivity(){
             val originalQuantity = remember { mutableStateOf(1) }
             val newQuantity = remember { mutableStateOf(1) }
             val showBasketDialog = remember { mutableStateOf(false) }
+            val db = DataBaseHandler(context)
+            val shortlistFlag = remember { mutableStateOf(false) }
 
             LaunchedEffect(loadingKey.value) {
                 coroutineScope.launch {
@@ -73,6 +75,16 @@ class ShopItemsActivity : ComponentActivity(){
                         }
                         basketActionFlag.value = false
                     }
+
+                    if(shortlistFlag.value){
+                        if(db.contains(chosenItem.value.id))
+                            Toast.makeText(context, "Item is already shortlisted!", Toast.LENGTH_SHORT).show()
+                        else{
+                            db.addItem(chosenItem.value)
+                            Toast.makeText(context, "Item is successfully shortlisted!", Toast.LENGTH_SHORT).show()
+                        }
+                       shortlistFlag.value = false
+                    }
                 }
             }
 
@@ -92,6 +104,7 @@ class ShopItemsActivity : ComponentActivity(){
                                 items = items,
                                 chosenItem = chosenItem,
                                 basketDialogFlag = basketDialogFlag,
+                                shortlistFlag = shortlistFlag,
                                 loadingKey = loadingKey)
         }
     }
@@ -103,6 +116,7 @@ fun DrawShopItemsLayout(token: String,
                         items: MutableList<Item>,
                         chosenItem: MutableState<Item>,
                         basketDialogFlag: MutableState<Boolean>,
+                        shortlistFlag: MutableState<Boolean>,
                         loadingKey: MutableState<Boolean>){
     val context = LocalContext.current
     Scaffold(
@@ -122,6 +136,7 @@ fun DrawShopItemsLayout(token: String,
                                            items = items,
                                            chosenItem = chosenItem,
                                            basketDialogFlag = basketDialogFlag,
+                                           shortlistFlag = shortlistFlag,
                                            loadingKey = loadingKey)
     }
 }
@@ -132,6 +147,7 @@ fun DrawShopItemsBackLayout(padding: PaddingValues,
                             items: MutableList<Item>,
                             chosenItem: MutableState<Item>,
                             basketDialogFlag: MutableState<Boolean>,
+                            shortlistFlag: MutableState<Boolean>,
                             loadingKey: MutableState<Boolean>){
     val context = LocalContext.current
     Column(modifier = Modifier.padding(padding)) {
@@ -139,7 +155,7 @@ fun DrawShopItemsBackLayout(padding: PaddingValues,
             items(items){
                     item -> ItemRow(item = item,
                                     onBasketClick = { chosenItem.value = item; basketDialogFlag.value = true; loadingKey.value = !loadingKey.value },
-                                    onShortlistClick = {}){
+                                    onShortlistClick = { chosenItem.value = item; shortlistFlag.value = true; loadingKey.value = !loadingKey.value }){
                         context.startActivity(Intent(context, ItemActivity::class.java).also {
                         it.putExtra("Token", token)
                         it.putExtra("ItemId", item.id)

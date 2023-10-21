@@ -69,7 +69,7 @@ fun createMenuLists(context: Context, coroutineScope: CoroutineScope, drawerStat
             MenuItem("Orders", Icons.Default.List) { Log.d("home", "orders") },
             MenuItem("Shop", Icons.Default.Store) { coroutineScope.launch { drawerState.close() }; context.startActivity(Intent(context, ShopSellersActivity::class.java).also { it.putExtra("Token", token) }) },
             MenuItem("Basket", Icons.Default.ShoppingBasket) { coroutineScope.launch { drawerState.close() }; context.startActivity(Intent(context, BasketActivity::class.java).also { it.putExtra("Token", token) }) },
-            MenuItem("Shortlist", Icons.Default.Bookmarks) { Log.d("home", "shortlist") },
+            MenuItem("Shortlist", Icons.Default.Bookmarks) { coroutineScope.launch { drawerState.close() }; context.startActivity(Intent(context, ShortlistActivity::class.java).also { it.putExtra("Token", token) }) },
             MenuItem("Help", Icons.Default.Help) { Log.d("home", "help") },
             MenuItem("Logout", Icons.Default.Logout) { Log.d("home", "logout") }
         )

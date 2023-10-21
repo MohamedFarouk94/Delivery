@@ -29,6 +29,7 @@
         <activity android:name=".ItemActivity"> </activity>
         <activity android:name=".ReviewActivity"> </activity>
         <activity android:name=".BasketActivity"> </activity>
+        <activity android:name=".ShortlistActivity"> </activity>
     </application>
 
 </manifest>

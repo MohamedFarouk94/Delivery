@@ -31,7 +31,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import kotlinx.coroutines.launch
 
-class BasketActivity : ComponentActivity() {
+class ShortlistActivity : ComponentActivity() {
     @SuppressLint("MutableCollectionMutableState")
     override fun onCreate(savedInstanceState: Bundle?){
         val token = intent.getStringExtra("Token")
@@ -44,6 +44,7 @@ class BasketActivity : ComponentActivity() {
             var basket by remember { mutableStateOf(mutableListOf<BasketItem>()) }
             var items by remember { mutableStateOf(mutableListOf<Item>()) }
             val chosenItem = remember{ mutableStateOf(Item()) }
+            var itemInBasket by remember { mutableStateOf(false) }
             val showBasketDialog = remember { mutableStateOf(false) }
             val basketDialogFlag = remember { mutableStateOf(false) }
             val basketActionFlag = remember { mutableStateOf(false) }
@@ -55,23 +56,23 @@ class BasketActivity : ComponentActivity() {
 
             LaunchedEffect(loadingKey.value){
                 coroutineScope.launch {
-                    basket = getBasket(token!!)
-                    if(basket.size > 0) items = basket.map { basketItem -> getItem(token, basketItem.itemId) } as MutableList<Item>
+                    items = db.getItems()
 
                     if(basketDialogFlag.value){
-                        originalQuantity.value = basket.find { basketItem -> basketItem.itemId == chosenItem.value.id }?.quantity!!
+                        basket = getBasket(token!!)
+                        itemInBasket = basket.any { basketItem -> basketItem.itemId ==  chosenItem.value.id}
+                        originalQuantity.value = if(itemInBasket) basket.find { basketItem -> basketItem.itemId == chosenItem.value.id }?.quantity!! else 1
                         showBasketDialog.value = true
                         basketDialogFlag.value = false
                     }
 
                     if(basketActionFlag.value){
                         when (basketAction.value) {
-                            // No Add
-                            "Edit" -> { editQuantity(token, chosenItem.value.id, newQuantity.value); Toast.makeText(context,"Item quantity is successfully changed", Toast.LENGTH_SHORT).show() }
-                            "Remove" -> { removeFromBasket(token, chosenItem.value.id); Toast.makeText(context,"Item is successfully removed from your basket", Toast.LENGTH_SHORT).show() }
+                            "Add" -> { addToBasket(token!!, chosenItem.value.id, newQuantity.value); Toast.makeText(context,"Item is successfully added to your basket", Toast.LENGTH_SHORT).show() }
+                            "Edit" -> { editQuantity(token!!, chosenItem.value.id, newQuantity.value); Toast.makeText(context,"Item quantity is successfully changed", Toast.LENGTH_SHORT).show() }
+                            "Remove" -> { removeFromBasket(token!!, chosenItem.value.id); Toast.makeText(context,"Item is successfully removed from your basket", Toast.LENGTH_SHORT).show() }
                         }
                         basketActionFlag.value = false
-                        loadingKey.value = !loadingKey.value // Refresh again
                     }
 
                     if(shortlistFlag.value){
@@ -82,6 +83,7 @@ class BasketActivity : ComponentActivity() {
                             Toast.makeText(context, "Item is successfully shortlisted!", Toast.LENGTH_SHORT).show()
                         }
                         shortlistFlag.value = false
+                        loadingKey.value = !loadingKey.value  // Refresh again
                     }
                 }
             }
@@ -91,14 +93,13 @@ class BasketActivity : ComponentActivity() {
                 originalQuantity = originalQuantity.value,
                 newQuantity = newQuantity,
                 unitPrice = chosenItem.value.price,
-                edit = true,    // Because all items here are already in the basket
+                edit = itemInBasket,
                 setShow = { showBasketDialog.value = it },
-                addToBasket = { /** Unused **/ },   // Because all items here are already in the basket
+                addToBasket = { basketAction.value = "Add"; basketActionFlag.value = true; loadingKey.value = !loadingKey.value },
                 editQuantity = { basketAction.value = "Edit"; basketActionFlag.value = true; loadingKey.value = !loadingKey.value },
                 removeFromBasket = { basketAction.value = "Remove"; basketActionFlag.value = true; loadingKey.value = !loadingKey.value })
 
-            DrawBasketLayout(token = token!!,
-                            basket = basket,
+            DrawShortlistLayout(token = token!!,
                             items = items,
                             chosenItem = chosenItem,
                             basketDialogFlag = basketDialogFlag,
@@ -109,8 +110,7 @@ class BasketActivity : ComponentActivity() {
 }
 
 @Composable
-fun DrawBasketLayout(token: String,
-                     basket: MutableList<BasketItem>,
+fun DrawShortlistLayout(token: String,
                      items: MutableList<Item>,
                      chosenItem: MutableState<Item>,
                      basketDialogFlag: MutableState<Boolean>,
@@ -121,7 +121,7 @@ fun DrawBasketLayout(token: String,
         topBar = {
             Column {
                 AppBar(
-                    title = "Basket",
+                    title = "Shortlist",
                     icon = Icons.Default.ArrowBack,
                     onIconClick = { (context as Activity).finish() },
                     contentDescription = "Back"
@@ -129,9 +129,8 @@ fun DrawBasketLayout(token: String,
             }
         }
     ) {
-        padding -> DrawBasketBackLayout(padding = padding,
+        padding -> DrawShortlistBackLayout(padding = padding,
                                         token = token,
-                                        basket = basket,
                                         items = items,
                                         chosenItem = chosenItem,
                                         basketDialogFlag = basketDialogFlag,
@@ -141,9 +140,8 @@ fun DrawBasketLayout(token: String,
 }
 
 @Composable
-fun DrawBasketBackLayout(padding: PaddingValues,
+fun DrawShortlistBackLayout(padding: PaddingValues,
                          token: String,
-                         basket: MutableList<BasketItem>,
                          items: MutableList<Item>,
                          chosenItem: MutableState<Item>,
                          basketDialogFlag: MutableState<Boolean>,
@@ -152,14 +150,13 @@ fun DrawBasketBackLayout(padding: PaddingValues,
     val context = LocalContext.current
     Column(modifier = Modifier.padding(padding)) {
         if(items.size > 0) LazyColumn(Modifier, userScrollEnabled = true){
-            items(items.zip(basket)){
-                pair -> ItemRow(item = pair.component1(),
-                                quantity = pair.component2().quantity,
-                                onBasketClick = { chosenItem.value = pair.component1(); basketDialogFlag.value = true; loadingKey.value = !loadingKey.value },
-                                onShortlistClick = { chosenItem.value = pair.component1(); shortlistFlag.value = true; loadingKey.value = !loadingKey.value }) {
+            items(items){
+                item -> ItemRow(item = item,
+                                onBasketClick = { chosenItem.value = item; basketDialogFlag.value = true; loadingKey.value = !loadingKey.value },
+                                onShortlistClick = { chosenItem.value = item; shortlistFlag.value = true; loadingKey.value = !loadingKey.value }) {
                 context.startActivity(Intent(context, ItemActivity::class.java).also {
                     it.putExtra("Token", token)
-                    it.putExtra("ItemId", pair.component1().id)
+                    it.putExtra("ItemId", item.id)
                 })}
             }
         }
