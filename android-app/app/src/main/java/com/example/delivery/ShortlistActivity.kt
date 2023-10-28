@@ -53,6 +53,7 @@ class ShortlistActivity : ComponentActivity() {
             val newQuantity = remember { mutableStateOf(0) }
             val db = DataBaseHandler(context)
             val shortlistFlag = remember { mutableStateOf(false) }
+            val showShortlistDialog = remember { mutableStateOf(false) }
 
             LaunchedEffect(loadingKey.value){
                 coroutineScope.launch {
@@ -77,13 +78,13 @@ class ShortlistActivity : ComponentActivity() {
 
                     if(shortlistFlag.value){
                         if(db.contains(chosenItem.value.id))
-                            Toast.makeText(context, "Item is already shortlisted!", Toast.LENGTH_SHORT).show()
+                            showShortlistDialog.value = true
+
                         else{
                             db.addItem(chosenItem.value)
                             Toast.makeText(context, "Item is successfully shortlisted!", Toast.LENGTH_SHORT).show()
                         }
                         shortlistFlag.value = false
-                        loadingKey.value = !loadingKey.value  // Refresh again
                     }
                 }
             }
@@ -98,6 +99,13 @@ class ShortlistActivity : ComponentActivity() {
                 addToBasket = { basketAction.value = "Add"; basketActionFlag.value = true; loadingKey.value = !loadingKey.value },
                 editQuantity = { basketAction.value = "Edit"; basketActionFlag.value = true; loadingKey.value = !loadingKey.value },
                 removeFromBasket = { basketAction.value = "Remove"; basketActionFlag.value = true; loadingKey.value = !loadingKey.value })
+
+            if(showShortlistDialog.value) ShowAlertDialog(
+                onDismissRequest = { showShortlistDialog.value = false },
+                onConfirmation = { db.removeItem(chosenItem.value.id); showShortlistDialog.value = false; Toast.makeText(context, "Item is removed from shortlist!", Toast.LENGTH_SHORT).show(); loadingKey.value = !loadingKey.value },
+                dialogTitle = "Remove From Shortlist",
+                dialogText = "This item is already shortlisted. Do you want to remove it from shortlist?"
+            )
 
             DrawShortlistLayout(token = token!!,
                             items = items,

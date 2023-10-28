@@ -54,6 +54,7 @@ class ShopItemsActivity : ComponentActivity(){
             val showBasketDialog = remember { mutableStateOf(false) }
             val db = DataBaseHandler(context)
             val shortlistFlag = remember { mutableStateOf(false) }
+            val showShortlistDialog = remember { mutableStateOf(false) }
 
             LaunchedEffect(loadingKey.value) {
                 coroutineScope.launch {
@@ -78,7 +79,8 @@ class ShopItemsActivity : ComponentActivity(){
 
                     if(shortlistFlag.value){
                         if(db.contains(chosenItem.value.id))
-                            Toast.makeText(context, "Item is already shortlisted!", Toast.LENGTH_SHORT).show()
+                            showShortlistDialog.value = true
+
                         else{
                             db.addItem(chosenItem.value)
                             Toast.makeText(context, "Item is successfully shortlisted!", Toast.LENGTH_SHORT).show()
@@ -98,6 +100,13 @@ class ShopItemsActivity : ComponentActivity(){
                 addToBasket = { basketAction.value = "Add"; basketActionFlag.value = true; loadingKey.value = !loadingKey.value },
                 editQuantity = { basketAction.value = "Edit"; basketActionFlag.value = true; loadingKey.value = !loadingKey.value },
                 removeFromBasket = { basketAction.value = "Remove"; basketActionFlag.value = true; loadingKey.value = !loadingKey.value })
+
+            if(showShortlistDialog.value) ShowAlertDialog(
+                onDismissRequest = { showShortlistDialog.value = false },
+                onConfirmation = { db.removeItem(chosenItem.value.id); showShortlistDialog.value = false; Toast.makeText(context, "Item is removed from shortlist!", Toast.LENGTH_SHORT).show() },
+                dialogTitle = "Remove From Shortlist",
+                dialogText = "This item is already shortlisted. Do you want to remove it from shortlist?"
+            )
 
             DrawShopItemsLayout(token = token!!,
                                 sellerName = sellerName!!,
