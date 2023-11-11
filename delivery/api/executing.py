@@ -343,6 +343,15 @@ def getOrder(request, **kwargs):
 		return False, HttpResponseBadRequest('{"details": "Something wrong happened"}')
 
 
+def getOrderBasket(request, **kwargs):
+	order = Order.objects.get(id=kwargs['id'])
+	try:
+		return True, Response(list_to_dict(order.get_basket()))
+	except Exception as e:
+		print('#UNKNOWN ERROR#', str(e))
+		return False, HttpResponseBadRequest('{"details": "Something wrong happened"}')
+
+
 def sendOrderReview(request, **kwargs):
 	order = Order.objects.get(id=kwargs['id'])
 	person = Person.objects.get(user=request.user)

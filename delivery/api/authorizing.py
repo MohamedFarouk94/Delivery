@@ -1,4 +1,4 @@
-from database.models import Item, Person, Order, Review
+from database.models import Item, Person, Order
 from django.http import HttpResponseForbidden
 
 
@@ -280,6 +280,17 @@ def getOrders(request, **kwargs):
 
 
 def getOrder(request, **kwargs):
+	order = Order.objects.get(id=kwargs['id'])
+	flag, response = True, None
+
+	# Checking sender is related to order
+	if flag:
+		flag, response = assert_sender_true(request, lambda r: order.know_this_person(Person.objects.get(user=r.user)))
+
+	return flag, response
+
+
+def getOrderBasket(request, **kwargs):
 	order = Order.objects.get(id=kwargs['id'])
 	flag, response = True, None
 

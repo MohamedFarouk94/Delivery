@@ -36,6 +36,7 @@ urlpatterns = [
 
 	path('orders', views.getOrders, name='getOrders'),
 	path('orders/<int:id>', views.getOrder, name='getOrder'),
+	path('orders/<int:id>/basket', views.getOrderBasket, name='getOrderBasket'),
 	path('orders/<int:id>/send-review', views.sendOrderReview, name='sendOrderReview'),
 
 	path('available-orders', views.getAvailableOrders, name='getAvailableOrders'),

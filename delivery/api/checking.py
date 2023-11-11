@@ -1,4 +1,4 @@
-from database.models import Item, Seller, Order, Review
+from database.models import Item, Seller, Order
 from django.http import HttpResponseBadRequest, HttpResponseNotFound
 from django.core.exceptions import ObjectDoesNotExist
 
@@ -297,6 +297,16 @@ def getOrders(request, **kwargs):
 
 
 def getOrder(request, **kwargs):
+	flag, response = True, None
+
+	# Checking that order exists
+	if flag:
+		flag, response = assert_object_exists(Order, **kwargs)
+
+	return flag, response
+
+
+def getOrderBasket(request, **kwargs):
 	flag, response = True, None
 
 	# Checking that order exists

@@ -18,6 +18,13 @@ def get_orders(self):
 	return Order.objects.filter(**kwargs)
 
 
+def get_order_basket(self, order):
+	if self.category == 'Seller':
+		raise AttributeError('Seller object has no attribute orders.')
+
+	return order.get_basket()
+
+
 def send_order_review(self, order, rating, text):
 	if self.category == 'Seller':
 		raise AttributeError('Seller object has no attribute orders.')

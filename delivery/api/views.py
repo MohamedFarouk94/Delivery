@@ -192,6 +192,13 @@ def getOrder(request, **kwargs):
 @api_view(['GET'])
 @authentication_classes([TokenAuthentication])
 @permission_classes([IsAuthenticated])
+def getOrderBasket(request, **kwargs):
+	return check_auth_exec('getOrderBasket', request, **kwargs)
+
+
+@api_view(['GET'])
+@authentication_classes([TokenAuthentication])
+@permission_classes([IsAuthenticated])
 def sendOrderReview(request, **kwargs):
 	return check_auth_exec('sendOrderReview', request, **kwargs)
 
