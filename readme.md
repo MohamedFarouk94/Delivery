@@ -44,7 +44,7 @@ Delivery consists of a Backend API, an Adnroid application for customers and pil
 | POST | /items/:ItemId/send-review | Posting a review for an item | Yes | Customer | rating<br>text |
 | GET | /orders | Getting orders related to user | Yes | Customer/Pilot | |
 | GET | /orders/:OrderId | Getting a specific order | Yes | Customer/Pilot | |
-| GET | /orders/:OrderId | Getting the basket of a specific order | Yes | Customer/Pilot | |
+| GET | /orders/:OrderId/basket | Getting the basket of a specific order | Yes | Customer/Pilot | |
 | POST | /orders/:OrderId/review | Posting a review for an order | Yes | Customer/Pilot | rating<br>text |
 | GET | /available-orders | Getting orders in need to a pilot in a pilot's region | Yes | Pilot | |
 | PATCH | /orders/:OrderId/accept | Accepting an order | Yes | Pilot | |
